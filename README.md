@@ -6,7 +6,7 @@
 [cookbook]: https://supermarket.chef.io/cookbooks/play
 [travis]: https://travis-ci.org/dhoer/chef-play
 
-Installs distribution artifact, created by the 
+Installs Play distribution artifact, created by the 
 [dist task (Play 2.2+)](https://www.playframework.com/documentation/2.5.x/Production#Using-the-dist-task), 
 and configures it as a service.
 
