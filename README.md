@@ -6,7 +6,7 @@
 [cookbook]: https://supermarket.chef.io/cookbooks/play
 [travis]: https://travis-ci.org/dhoer/chef-play
 
-Installs [distribution artifact](https://www.playframework.com/documentation/2.5.x/Production), 
+Installs [distribution artifact](https://www.playframework.com/documentation/2.5.x/Production#Using-the-dist-task), 
 created by the dist task (Play 2.2+), as a service.
 
 It is recommended that you include a `application.conf.erb` template file within the distribution artifact to configure 
