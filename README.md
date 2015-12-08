@@ -13,11 +13,11 @@ It is recommended that you include a `application.conf.erb` template file within
 environment specific variables like application secret.  
  
 To include the .erb file in your distribution artifact, copy `application.conf` file and paste it as 
-`application.conf.erb` in the same directory. Then replace the environment specific values with variables. These
-variable names must match variable name passed into `config_variables`.
+`application.conf.erb` in the same directory. Then replace the environment specific values with variables. 
 
 For example, replace `play.crypto.secret = "changeme"` with `play.crypto.secret = "<%= @secret %>"` in 
-`application.conf.erb` file, then pass the value as a parameter into `config_values` attribute of Play resource:
+`application.conf.erb` file, then pass the value as a parameter into `config_values` attribute of Play resource. 
+These variable names must match variable name passed into `config_variables`.
   
 So if application.conf.erb contained:
 
