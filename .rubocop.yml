@@ -1,10 +1,10 @@
-#AlignParameters:
-#  Enabled: false
-#
-#Encoding:
-#  Enabled: false
-#
+AllCops:
+  Exclude:
+    - vendor/**/*
+    - .kitchen/*
+
 LineLength:
+  Enabled: true
   Max: 120
 
 MethodLength:
