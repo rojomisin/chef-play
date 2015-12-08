@@ -6,8 +6,8 @@
 [cookbook]: https://supermarket.chef.io/cookbooks/play
 [travis]: https://travis-ci.org/dhoer/chef-play
 
-Installs the [distribution artifact](https://www.playframework.com/documentation/2.5.x/Production) (2.2+),
-created by the dist task, as a service.
+Installs [distribution artifact](https://www.playframework.com/documentation/2.5.x/Production), 
+created by the dist task (Play 2.2+), as a service.
 
 It is recommended that you include a `application.conf.erb` template file within the distribution artifact to configure 
 environment specific variables like application secret.  
@@ -37,7 +37,7 @@ play 'servicename' do
 end
 ```
 
-This would result in creating or overriding application.conf as:
+This would result in creating or overriding `application.conf` as:
 
 ```ruby
 play.crypto.secret = "abcdefghijk"
@@ -67,24 +67,24 @@ for an example using play cookbook to install distribution artifact as a service
 
 ### Attributes
 
-* `servicename` - Service name to run as.  Default value: the `name` of the resource block
-* `source` - URL to archive or directory path to exploded archive. 
-* `checksum` - The SHA-256 checksum of the file. Use to prevent the resource from re-downloading a file. 
-When the local file matches the checksum, the chef-client will not download it.
+* `servicename` - Service name to run as.  Defaults to name of resource block.
+* `source` - URI to archive or directory path to exploded archive. 
+* `checksum` - The SHA-256 checksum of the file. Use to prevent resource from re-downloading a file. 
+When  local file matches the checksum, the chef-client will not download it.
 * `project_name` - Used to identify start script executable.  Defaults to project name derived from standalone 
-distribution filename, if project_name not provided.
-* `version` - Version of application.  Defaults to version derived from standalone distribution filename, if version 
+distribution filename, if not provided.
+* `version` - Version of application.  Defaults to version derived from standalone distribution filename, if 
 not provided. Not needed if source is a directory.
-* `user` - User to run service as.  Default value: `play`
-* `args` - Array of additional configuration arguments.  Default value: empty array `[]` 
+* `user` - User to run service as.  Default `play`.
+* `args` - Array of additional configuration arguments.  Default `[]`. 
 * `config_variables` - Hash of application configuration variables required by application.conf.erb template.  
-Default value: empty hash `{}`
+Default `{}`.
 * `config_template` - Path to configuration template.  Path can be relative, or if the template file is outside dist 
-path, absolute.  Default value: `conf/application.conf.erb`
+path, absolute.  Default `conf/application.conf.erb`.
 * `config_path` - Path to application configuration file. Path can be relative, or if the config file is outside 
 standalone distribution, absolute. This is also the path to the location in which a file will be created and the name 
-of the file to be managed by template. Default value: `conf/application.conf`
-* `pid_dir` - The pid directory. Default value: `/var/run/play`
+of the file to be managed by template. Default `conf/application.conf`.
+* `pid_dir` - The pid directory. Default `/var/run/play`.
 
 ### Examples
 
