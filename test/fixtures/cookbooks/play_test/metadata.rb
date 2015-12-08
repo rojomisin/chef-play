@@ -9,4 +9,3 @@ version '0.1.0'
 depends 'play'
 
 depends 'java_se', '~> 8.0'
-depends 'logrotate', '~> 0.8'
