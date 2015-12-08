@@ -22,14 +22,12 @@ platforms:
     - ["forwarded_port", {guest: 8080, host: 9003}]
 
 suites:
-- name: play
-#  encrypted_data_bag_secret_key_path: <%= ENV['ENCRYPTED_DATA_BAG_SECRET'] %>
-#  data_bags_path: <%= ENV['MERLE'] %>/data_bags
+- name: default
   run_list: ["recipe[play_test::default]"]
   attributes: {
     "play": {
       "config_variables": {
-        "secret": "mysecret"
+        "secret": "mysecret" # should be ignored since play_test sets it to a different value
       },
       "args": [
         "-Dhttp.port=8080",

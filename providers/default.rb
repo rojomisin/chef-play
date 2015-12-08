@@ -2,6 +2,8 @@ def whyrun_supported?
   true
 end
 
+use_inline_resources
+
 def play_service(project_name, home_dir)
   # create pid directory
   directory new_resource.pid_dir do
@@ -97,6 +99,8 @@ action :install do
       owner new_resource.user
       source template_path
       variables(new_resource.config_variables)
+      sensitive true
+      only_if { ::File.exist?(template_path) }
       notifies :restart, "service[#{new_resource.servicename}]", :delayed
     end
   end

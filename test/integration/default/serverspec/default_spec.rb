@@ -4,7 +4,7 @@ require 'serverspec'
 set :backend, :exec
 
 describe 'dist zip' do
-  describe file('/tmp/kitchen/cookbooks/play_test/files/default/sample-1.0.0.zip') do
+  describe file('/tmp/kitchen/cache/sample_service-1.0.zip') do
     it { should be_file }
   end
 
@@ -13,7 +13,7 @@ describe 'dist zip' do
     it { should belong_to_group 'play' }
   end
 
-  describe file('/opt/sample_service-1.0.0') do
+  describe file('/usr/local/sample_service-1.0') do
     it { should be_directory }
     it { should be_mode 755 }
     it { should be_owned_by 'play' }
@@ -21,13 +21,13 @@ describe 'dist zip' do
   end
 
   describe file('/usr/local/sample_service') do
-    it { should be_linked_to '/usr/local/sample_service-1.0.0' }
+    it { should be_linked_to '/usr/local/sample_service-1.0' }
     it { should be_mode 777 }
     it { should be_owned_by 'root' }
     it { should be_grouped_into 'root' }
   end
 
-  describe file('/usr/local/sample_service/bin/sample') do
+  describe file('/usr/local/sample_service/bin/play-java-sample') do
     it { should be_file }
     it { should be_mode 755 }
     it { should be_owned_by 'play' }
@@ -39,7 +39,7 @@ describe 'dist zip' do
     it { should be_mode 644 }
     it { should be_owned_by 'play' }
     it { should be_grouped_into 'root' }
-    its(:content) { should match(/application\.secret="testingonetwothree"/) }
+    its(:content) { should match(/play.crypto.secret = "testingonetwothree"/) }
   end
 
   describe file('/var/run/play/sample_service.pid') do
@@ -54,7 +54,7 @@ describe 'dist zip' do
     it { should be_owned_by 'root' }
     it { should be_grouped_into 'root' }
     its(:content) { should match(%r{PLAY_DIST_HOME="/usr/local/sample_service"}) }
-    its(:content) { should match(%r{PLAY="\$\{PLAY_DIST_HOME\}/bin/sample"}) }
+    its(:content) { should match(%r{PLAY="\$\{PLAY_DIST_HOME\}/bin/play-java-sample"}) }
     its(:content) { should match(/USER="play"/) }
     its(:content) { should match(%r{PID_PATH="/var/run/play"}) }
     its(:content) { should match(%r{PID_FILE="\$\{PID_PATH\}/sample_service.pid"}) }
@@ -62,20 +62,6 @@ describe 'dist zip' do
     its(:content) { should match(/APP_ARGS="-Dhttp\.port=8080 -J-Xms128M -J-Xmx512m -J-server"/) }
     its(:content) { should match(%r{su -s /bin/sh \$\{USER\} -c "\( \$\{PLAY\} -Dpidfile\.path=\$\{PID_FILE\}}) }
     its(:content) { should match(/-Dconfig\.file=\$\{CONFIG_FILE\} \$\{APP_ARGS\} &\ \)/) }
-  end
-
-  describe file('/etc/logrotate.d/sample_service') do
-    it { should be_file }
-    it { should be_mode 440 }
-    it { should be_owned_by 'root' }
-    it { should be_grouped_into 'root' }
-    its(:content) { should match(%r{/usr/local/sample_service/logs/application.log"}) }
-    its(:content) { should match(/weekly/) }
-    its(:content) { should match(/missingok/) }
-    its(:content) { should match(/compress/) }
-    its(:content) { should match(/delaycompress/) }
-    its(:content) { should match(/copytruncate/) }
-    its(:content) { should match(/notifempty/) }
   end
 
   describe service('sample_service') do
@@ -88,6 +74,6 @@ describe 'dist zip' do
   end
 
   describe command('wget -O - localhost:8080') do
-    its(:stdout) { should match(%r{<h1>Sample application is ready.<\/h1>}) }
+    its(:stdout) { should match(%r{<h1>Your new application is ready.<\/h1>}) }
   end
 end

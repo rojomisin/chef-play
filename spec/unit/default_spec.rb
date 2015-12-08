@@ -71,7 +71,7 @@ describe 'play_test::default' do
     end
 
     it 'creates application.conf' do
-      expect(chef_run).to create_template('/usr/local/sample_service/conf/application.conf').with(
+      expect(chef_run).to_not create_template('/usr/local/sample_service/conf/application.conf').with(
         user: 'play'
       )
     end

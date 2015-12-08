@@ -43,8 +43,8 @@ This would result in creating or overriding `application.conf` as:
 play.crypto.secret = "abcdefghijk"
 ```
 
-Note that application configuration template can be external from distribution artifact.  See `config_template` 
-attribute below for more information.
+Note that application configuration template can also be external from distribution artifact or nil. See
+`config_template` attribute below for more information.
 
 ## Requirements
 
@@ -77,13 +77,11 @@ distribution filename, if not provided.
 not provided. Not needed if source is a directory.
 * `user` - User to run service as.  Default `play`.
 * `args` - Array of additional configuration arguments.  Default `[]`. 
-* `config_variables` - Hash of application configuration variables required by application.conf.erb template.  
-Default `{}`.
+* `config_variables` - Hash of application configuration variables required by .erb template. Default `{}`.
 * `config_template` - Path to configuration template.  Path can be relative, or if the template file is outside dist 
-path, absolute.  Default `conf/application.conf.erb`.
+path, absolute.  If set to nil, no template processing will occur. Default `conf/application.conf.erb`.
 * `config_path` - Path to application configuration file. Path can be relative, or if the config file is outside 
-standalone distribution, absolute. This is also the path to the location in which a file will be created and the name 
-of the file to be managed by template. Default `conf/application.conf`.
+standalone distribution, absolute. Default `conf/application.conf`.
 * `pid_dir` - The pid directory. Default `/var/run/play`.
 
 ### Examples
@@ -94,7 +92,8 @@ To `install` a standalone distribution as service from remote archive:
 play 'servicename' do
   source 'https://example.com/dist/myapp-1.0.0.zip'
   config_variables(
-    foo: 'bar'
+    secret: 'mysecret'
+    langs: %w(en fr)
   )
   args([
     '-Dhttp.port=8080',
@@ -112,7 +111,8 @@ To `install` a standalone distribution as service from local file:
 play 'servicename' do
   source 'file:///var/chef/cache/myapp-1.0.0.zip'
   config_variables(
-    foo: 'bar'
+    secret: 'mysecret'
+    langs: %w(en fr)
   )
   args([
     '-Dhttp.port=8080',
@@ -124,15 +124,13 @@ play 'servicename' do
 end
 ```
 
-To `install` a standalone distribution as service from exploded archive:
+To `install` a standalone distribution as service from exploded archive using provided application.conf as is:
 
 ```ruby
 play 'sample_service' do
   source '/var/local/mysample'
   project_name 'sample'
-  config_variables(
-    foo: 'bar'
-  )
+  config_template nil # no template will be processed and application.conf defined in config_path will be used
   args([
     '-Dhttp.port=8080',
     '-J-Xms128m',
@@ -141,31 +139,6 @@ play 'sample_service' do
   ])
   action :install
 end
-```
-
-### Override Attributes
-
-You can also use override attributes in the environment file (the attribute to be overridden must 
-not be set in play LWRP; otherwise, override attribute will be ignored):
-
-```ruby
-{
-  "override_attributes": {
-    "play": {
-      "config_variables": {
-        "foo": "bar"
-      },
-      "args": [
-        "-Dhttp.port=8080",
-        "-J-Xms128m",
-        "-J-Xmx512m",
-        "-J-server"
-      ]
-    },
-    ...
-  },
-  ...
-}
 ```
 
 ## ChefSpec Matchers
