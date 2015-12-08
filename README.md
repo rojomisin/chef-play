@@ -6,8 +6,9 @@
 [cookbook]: https://supermarket.chef.io/cookbooks/play
 [travis]: https://travis-ci.org/dhoer/chef-play
 
-Installs [distribution artifact](https://www.playframework.com/documentation/2.5.x/Production#Using-the-dist-task), 
-created by the dist task (Play 2.2+), as a service.
+Installs distribution artifact, created by the 
+[dist task (Play 2.2+)](https://www.playframework.com/documentation/2.5.x/Production#Using-the-dist-task), 
+as a service.
 
 It is recommended that you include a `application.conf.erb` template file within the distribution artifact to configure 
 environment specific variables like application secret.  
@@ -16,8 +17,8 @@ To include the .erb file in your distribution artifact, copy `application.conf` 
 `application.conf.erb` in the same directory. Then replace the environment specific values with variables. 
 
 For example, replace `play.crypto.secret = "changeme"` with `play.crypto.secret = "<%= @secret %>"` in 
-`application.conf.erb` file, then pass the value as a parameter into `config_values` attribute of Play resource. 
-These variable names must match variable name passed into `config_variables`.
+`application.conf.erb` file, then pass the variables and their values under `config_variables` 
+attribute of Play resource. The variable names in template must match variable names passed into `config_variables`.
   
 So if application.conf.erb contained:
 
@@ -130,7 +131,7 @@ To `install` a standalone distribution as service from exploded archive using pr
 play 'sample_service' do
   source '/var/local/mysample'
   project_name 'sample'
-  config_template nil # no template will be processed and application.conf defined in config_path will be used
+  config_template nil # no template will be processed and conf file defined in config_path will be used
   args([
     '-Dhttp.port=8080',
     '-J-Xms128m',
