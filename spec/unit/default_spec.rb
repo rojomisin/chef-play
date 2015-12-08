@@ -1,16 +1,11 @@
 require 'spec_helper'
 
 describe 'play_test::default' do
-  before do
-    allow_any_instance_of(::File).to receive(:directory?) { true }
-  end
-
   let(:chef_run) do
     ChefSpec::SoloRunner.new(
       platform: 'centos', version: '6.7', step_into: ['play']).converge(described_recipe)
   end
   let(:play_service_template) { chef_run.template('/etc/init.d/sample_service') }
-  # let(:service) { chef_run.service('sample_service') }
 
   it 'includes java recipe' do
     expect(chef_run).to include_recipe('java_se::default')
