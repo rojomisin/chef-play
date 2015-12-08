@@ -31,7 +31,7 @@ def play_service(project_name, home_dir)
   # create play service
   template "/etc/init.d/#{new_resource.servicename}" do
     cookbook 'play'
-    source "#{node['platform_family']}/play.init.erb"
+    source "#{node['platform_family']}.init.erb"
     owner 'root'
     group 'root'
     mode 0755
