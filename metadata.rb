@@ -2,7 +2,7 @@ name 'play'
 maintainer 'Dennis Hoer'
 maintainer_email 'dennis.hoer@gmail.com'
 license 'MIT'
-description 'Installs distribution artifact, created by the dist task (Play 2.2+), as a service.'
+description 'Installs/Configures distribution artifact as a service.'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version '1.0.0'
 

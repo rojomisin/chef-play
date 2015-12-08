@@ -8,7 +8,7 @@
 
 Installs distribution artifact, created by the 
 [dist task (Play 2.2+)](https://www.playframework.com/documentation/2.5.x/Production#Using-the-dist-task), 
-as a service.
+and configures it as a service.
 
 It is recommended that you include a `application.conf.erb` template file within the distribution artifact to configure 
 environment specific variables like application secret.  
