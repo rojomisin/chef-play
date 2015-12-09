@@ -1,9 +1,16 @@
 require 'spec_helper'
 
-describe 'play_test::default' do
+SOURCE = 'https://github.com/dhoer/play-java-sample/releases/download/1.0/play-java-sample-1.0.zip'
+CONF_VARIABLES = { secret: 'testingonetwothree' }
+SERVICENAME = 'sample_service'
+
+describe 'play::default' do
   let(:chef_run) do
-    ChefSpec::SoloRunner.new(
-      platform: 'centos', version: '6.7', step_into: ['play']).converge(described_recipe)
+    ChefSpec::SoloRunner.new(platform: 'centos', version: '6.7', step_into: ['play']) do |node|
+      node.set['play']['servicename'] = SERVICENAME
+      node.set['play']['source'] = SOURCE
+      node.set['play']['conf_variables'] = CONF_VARIABLES
+    end.converge(described_recipe)
   end
   let(:play_service_template) { chef_run.template('/etc/init.d/sample_service') }
 
@@ -28,9 +35,9 @@ describe 'play_test::default' do
   end
 
   it 'runs play install action' do
-    expect(chef_run).to install_play('sample_service').with(
-      source: 'https://github.com/dhoer/play-java-sample/releases/download/1.0/play-java-sample-1.0.zip',
-      config_variables: { secret: 'testingonetwothree' }
+    expect(chef_run).to install_play(SERVICENAME).with(
+      source: SOURCE,
+      conf_variables: CONF_VARIABLES
     )
   end
 
@@ -43,10 +50,10 @@ describe 'play_test::default' do
     end
 
     it 'does not install sample_service as a service' do
-      expect(chef_run).to_not enable_service('sample_service')
-      expect(chef_run).to_not restart_service('sample_service')
-      expect(chef_run).to_not stop_service('sample_service')
-      expect(chef_run).to_not start_service('sample_service')
+      expect(chef_run).to_not enable_service(SERVICENAME)
+      expect(chef_run).to_not restart_service(SERVICENAME)
+      expect(chef_run).to_not stop_service(SERVICENAME)
+      expect(chef_run).to_not start_service(SERVICENAME)
     end
 
     it 'does not register sample_service to start on reboot' do

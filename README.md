@@ -17,35 +17,44 @@ To include the .erb file in your distribution artifact, copy `application.conf` 
 `application.conf.erb` in the same directory. Then replace the environment specific values with variables. 
 
 For example, replace `play.crypto.secret = "changeme"` with `play.crypto.secret = "<%= @secret %>"` in 
-`application.conf.erb` file, then pass the variable and its value using `config_variables` 
-attribute of Play resource. The variable names in template must match variable names passed into `config_variables`.
+`application.conf.erb` file, then pass the variable and its value using `conf_variables` 
+attribute of Play resource. The variable names in template must match variable names passed into `conf_variables`.
   
-So if application.conf.erb contained:
+So if `application.conf.erb` contained:
 
 ```ruby
 play.crypto.secret = "<%= @secret %>"
 ```
 
-And Play resource was called with:
+And Play recipe was called with:
+
+```ruby
+node.set['play']['servicename'] = 'servicename'
+node.set['play']['source'] = 'https://example.com/dist/myapp-1.0.0.zip'
+node.set['play']['conf_variables'] = { secret: 'abcdefghijk' }
+include_recipe 'play'
+```
+
+Or Play resource was called with:
 
 ```ruby
 play 'servicename' do
   source 'https://example.com/dist/myapp-1.0.0.zip'
-  config_variables(
+  conf_variables(
     secret: 'abcdefghijk'
   )
   action :install
 end
 ```
 
-This would result in creating or overriding `application.conf` as:
+This would result in creating/overriding `application.conf` as:
 
 ```ruby
 play.crypto.secret = "abcdefghijk"
 ```
 
 Note that application configuration template can also be external from distribution artifact or nil. See
-`config_template` attribute below for more information.
+`conf_template` attribute below for more information.
 
 ## Requirements
 
@@ -69,7 +78,7 @@ for an example using play cookbook to install distribution artifact as a service
 ### Attributes
 
 * `servicename` - Service name to run as.  Defaults to name of resource block.
-* `source` - URI to archive or directory path to exploded archive. 
+* `source` - URI to archive (zip, tar.gz, or tgz) or directory path to exploded archive. 
 * `checksum` - The SHA-256 checksum of the file. Use to prevent resource from re-downloading a file. 
 When  local file matches the checksum, the chef-client will not download it.
 * `project_name` - Used to identify start script executable.  Defaults to project name derived from standalone 
@@ -78,10 +87,10 @@ distribution filename, if not provided.
 not provided. Not needed if source is a directory.
 * `user` - User to run service as.  Default `play`.
 * `args` - Array of additional configuration arguments.  Default `[]`. 
-* `config_variables` - Hash of application configuration variables required by .erb template. Default `{}`.
-* `config_template` - Path to configuration template.  Path can be relative, or if the template file is outside dist 
+* `conf_variables` - Hash of application configuration variables required by .erb template. Default `{}`.
+* `conf_template` - Path to configuration template.  Path can be relative, or if the template file is outside dist 
 path, absolute.  If set to nil, no template processing will occur. Default `conf/application.conf.erb`.
-* `config_path` - Path to application configuration file. Path can be relative, or if the config file is outside 
+* `conf_path` - Path to application configuration file. Path can be relative, or if the config file is outside 
 standalone distribution, absolute. Default `conf/application.conf`.
 * `pid_dir` - The pid directory. Default `/var/run/play`.
 
@@ -92,7 +101,7 @@ To `install` a standalone distribution as service from remote archive:
 ```ruby
 play 'servicename' do
   source 'https://example.com/dist/myapp-1.0.0.zip'
-  config_variables(
+  conf_variables(
     secret: 'mysecret'
     langs: %w(en fr)
   )
@@ -111,7 +120,7 @@ To `install` a standalone distribution as service from local file:
 ```ruby
 play 'servicename' do
   source 'file:///var/chef/cache/myapp-1.0.0.zip'
-  config_variables(
+  conf_variables(
     secret: 'mysecret'
     langs: %w(en fr)
   )
@@ -131,7 +140,7 @@ To `install` a standalone distribution as service from exploded archive using pr
 play 'sample_service' do
   source '/var/local/mysample'
   project_name 'sample'
-  config_template nil # no template will be processed and conf file defined in config_path will be used
+  conf_template nil # no template will be processed and conf file defined in conf_path will be used
   args([
     '-Dhttp.port=8080',
     '-J-Xms128m',
@@ -152,7 +161,7 @@ Example Matcher Usage
 ```ruby
 expect(chef_run).to install_play('servicename').with(
   source: 'https://github.com/dhoer/play-java-sample/releases/download/1.0/play-java-sample-1.0.zip',
-  config_variables: {
+  conf_variables: {
     secret: 'abcdefghijk'
   }
 )

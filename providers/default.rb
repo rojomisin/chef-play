@@ -25,8 +25,8 @@ def play_service(project_name, home_dir)
     action :nothing
   end
 
-  config_path =
-    new_resource.config_file =~ %r{^/} ? new_resource.config_file : "#{home_dir}/#{new_resource.config_file}"
+  conf_path =
+    new_resource.conf_path =~ %r{^/} ? new_resource.conf_path : "#{home_dir}/#{new_resource.conf_path}"
 
   # create play service
   template "/etc/init.d/#{new_resource.servicename}" do
@@ -41,7 +41,7 @@ def play_service(project_name, home_dir)
       executable: project_name,
       user: new_resource.user,
       pid_path: new_resource.pid_dir,
-      config_file: config_path,
+      conf_path: conf_path,
       args: new_resource.args.join(' ')
     )
     notifies :enable, "service[#{new_resource.servicename}]", :immediately
@@ -51,13 +51,10 @@ end
 
 action :install do
   converge_by(new_resource) do
-    package 'unzip' do
-      action :install
-    end
+    package 'unzip'
 
     package 'rsync' do
-      action :install
-      only_if { node['platform'] == 'centos' }
+      only_if { node['platform_family'] == 'rhel' }
     end
 
     user new_resource.user do
@@ -87,18 +84,18 @@ action :install do
     play_service(project_name, home_dir)
 
     # make template path absolute, if relative
-    if new_resource.config_template =~ %r{^/}
-      template_path = new_resource.config_template
+    if new_resource.conf_template =~ %r{^/}
+      template_path = new_resource.conf_template
     else
-      template_path = "#{home_dir}/#{new_resource.config_template}"
+      template_path = "#{home_dir}/#{new_resource.conf_template}"
     end
 
     # create application.config
-    template "#{home_dir}/#{new_resource.config_file}" do
+    template "#{home_dir}/#{new_resource.conf_path}" do
       local true
       owner new_resource.user
       source template_path
-      variables(new_resource.config_variables)
+      variables(new_resource.conf_variables)
       sensitive true
       only_if { ::File.exist?(template_path) }
       notifies :restart, "service[#{new_resource.servicename}]", :delayed

@@ -24,7 +24,7 @@ if [[ ! -e ${PID_PATH} ]]; then
   chown ${USER}:${USER} ${PID_PATH}
 fi
 
-CONFIG_FILE="<%= @config_file %>"
+CONFIG_FILE="<%= @conf_path %>"
 APP_ARGS="<%= @args %>"
 
 # source function library
