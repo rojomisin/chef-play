@@ -35,14 +35,14 @@ node.set['play']['conf_variables'] = { secret: 'abcdefghijk' }
 include_recipe 'play'
 ```
 
-This would then result in creating/overriding `application.conf` with:
+This would then result in creating/replacing `application.conf` file with:
 
 ```ruby
 play.crypto.secret = "abcdefghijk"
 ```
 
-Note that application configuration template can also be external from distribution artifact or nil. See
-`conf_template` attribute below for more information.
+Note that conf_template path can also be external from distribution artifact. Leave conf_variable empty to skip 
+processing conf_template and use application configuration defined in conf_path.
 
 ## Requirements
 
@@ -60,13 +60,12 @@ Note that application configuration template can also be external from distribut
 
 ## Usage
 
-See [play_test](https://github.com/dhoer/chef-play/tree/master/test/fixtures/cookbooks/play_test) cookbook
-for an example using play cookbook to install distribution artifacts as a service.
+See [play_test](https://github.com/dhoer/chef-play/blob/master/test/fixtures/cookbooks/play_test/recipes/default.rb)
+cookbook for an example using play cookbook to install distribution artifacts as a service.
 
 ### Attributes
 
-The attributes descriptions below are for both resource and recipe 
-e.g., `servicename` or `node['play']['servicename']`.
+The attributes descriptions are for both resource and recipe e.g., `servicename` or `node['play']['servicename']`.
 
 * `servicename` - Service name to run as.  Defaults to name of resource block.
 * `source` - URI to archive (zip, tar.gz, or tgz) or directory path to exploded archive. 
@@ -78,9 +77,10 @@ distribution filename, if not provided.
 not provided. Not needed if source is a directory.
 * `user` - User to run service as.  Default `play`.
 * `args` - Array of additional configuration arguments.  Default `[]`. 
-* `conf_variables` - Hash of application configuration variables required by .erb template. Default `{}`.
+* `conf_variables` - Hash of application configuration variables required by .erb template. Leave empty
+to not process conf_template and use application configuration defined in conf_path as is.  Default `{}`.
 * `conf_template` - Path to configuration template.  Path can be relative, or if the template file is outside dist 
-path, absolute.  If set to nil or template file not found, no template processing will occur. 
+path, absolute.  If template file not found, no template processing will occur. 
 Default `conf/application.conf.erb`.
 * `conf_path` - Path to application configuration file. Path can be relative, or if the config file is outside 
 standalone distribution, absolute. Default `conf/application.conf`.
@@ -88,28 +88,10 @@ standalone distribution, absolute. Default `conf/application.conf`.
 
 ### Examples
 
-Examples below are using resource, but you can use the default recipe as well.
+Examples below are using resource, but you can use the default recipe to do the same thing as well.
 
-#### Install a standalone distribution as service from remote archive
 
-```ruby
-play 'servicename' do
-  source 'https://example.com/dist/myapp-1.0.0.zip'
-  conf_variables(
-    secret: 'mysecret'
-    langs: %w(en fr)
-  )
-  args([
-    '-Dhttp.port=8080',
-    '-J-Xms128M',
-    '-J-Xmx512m',
-    '-J-server'
-  ])
-  action :install
-end
-```
-
-#### Install a standalone distribution as service from local file
+#### Install a standalone distribution as service from local file and generate application.conf
 
 ```ruby
 play 'servicename' do
@@ -128,13 +110,14 @@ play 'servicename' do
 end
 ```
 
-#### Install a standalone distribution as service using default application.conf as is
+The application configuration defined in conf_path will be created or replaced by template defined in conf_template.
+
+#### Install exploded standalone distribution as service and don't generate application.conf
 
 ```ruby
 play 'sample_service' do
   source '/var/local/mysample'
   project_name 'sample'
-  conf_template nil # no template will be processed and conf file defined in conf_path will be used
   args([
     '-Dhttp.port=8080',
     '-J-Xms128m',
@@ -144,6 +127,8 @@ play 'sample_service' do
   action :install
 end
 ```
+
+Since no conf_variables are passed, the application configuration defined in conf_path will be used as is.
 
 ## ChefSpec Matchers
 

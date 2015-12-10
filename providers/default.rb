@@ -4,19 +4,19 @@ end
 
 use_inline_resources
 
-def play_service(project_name, home_dir)
+def play_service(home_dir, conf_path)
+  project_name = play_project_name
+
   # create pid directory
   directory new_resource.pid_dir do
     owner new_resource.user
     group new_resource.user
     mode 0755
-    action :create
   end
 
   # make play script executable
   execute "chmod +x #{project_name}" do
     cwd "#{home_dir}/bin"
-    action :run
   end
 
   service new_resource.servicename do
@@ -24,9 +24,6 @@ def play_service(project_name, home_dir)
     supports status: true, start: true, stop: true, restart: true
     action :nothing
   end
-
-  conf_path =
-    new_resource.conf_path =~ %r{^/} ? new_resource.conf_path : "#{home_dir}/#{new_resource.conf_path}"
 
   # create play service
   template "/etc/init.d/#{new_resource.servicename}" do
@@ -49,6 +46,44 @@ def play_service(project_name, home_dir)
   end
 end
 
+def play_configuration(home_dir, conf_path)
+  # make template path absolute, if relative
+  if new_resource.conf_template =~ %r{^/}
+    template_path = new_resource.conf_template
+  else
+    template_path = "#{home_dir}/#{new_resource.conf_template}"
+  end
+
+  # generate application.conf
+  template conf_path do
+    local true
+    owner new_resource.user
+    source template_path
+    variables(new_resource.conf_variables)
+    sensitive true
+    only_if { !new_resource.conf_variables.empty? && ::File.exist?(template_path) }
+    notifies :restart, "service[#{new_resource.servicename}]", :delayed
+  end
+end
+
+def play_project_name
+  return new_resource.project_name if new_resource.project_name
+  (new_resource.source).match(%r{.*/(.*)-[0-9].*})[1] # http://rubular.com/r/X9PUgZl0UW
+end
+
+def play_app_version
+  return new_resource.version if new_resource.version
+  (new_resource.source).match(/-([\d|.(-SNAPSHOT)]*)[-|.]/)[1] # http://rubular.com/r/KN2ILF3mj3
+end
+
+def play_home_dir
+  ::File.directory?(new_resource.source) ? new_resource.source : "/usr/local/#{new_resource.servicename}"
+end
+
+def play_conf_path(home_dir)
+  new_resource.conf_path =~ %r{^/} ? new_resource.conf_path : "#{home_dir}/#{new_resource.conf_path}"
+end
+
 action :install do
   converge_by(new_resource) do
     package 'unzip'
@@ -61,44 +96,19 @@ action :install do
       comment 'play'
       system true
       shell '/bin/false'
-      action :create
     end
-
-    version = new_resource.version
-    version ||= (new_resource.source).match(/-([\d|.|(-SNAPSHOT)]*)[-|.]/)[1] # http://rubular.com/r/X9K1KPkEpx
 
     ark new_resource.servicename do
       url new_resource.source
       checksum new_resource.checksum if new_resource.checksum
-      version version
+      version play_app_version
       owner new_resource.user
       not_if { ::File.directory?(new_resource.source) }
-      action :install
     end
 
-    project_name = new_resource.project_name
-    project_name ||= (new_resource.source).match(%r{.*/(.*)-[0-9].*})[1] # http://rubular.com/r/X9PUgZl0UW
-
-    home_dir = ::File.directory?(new_resource.source) ? new_resource.source : "/usr/local/#{new_resource.servicename}"
-
-    play_service(project_name, home_dir)
-
-    # make template path absolute, if relative
-    if new_resource.conf_template =~ %r{^/}
-      template_path = new_resource.conf_template
-    else
-      template_path = "#{home_dir}/#{new_resource.conf_template}"
-    end
-
-    # create application.config
-    template "#{home_dir}/#{new_resource.conf_path}" do
-      local true
-      owner new_resource.user
-      source template_path
-      variables(new_resource.conf_variables)
-      sensitive true
-      only_if { ::File.exist?(template_path) }
-      notifies :restart, "service[#{new_resource.servicename}]", :delayed
-    end
+    home_dir = play_home_dir
+    conf_path = play_conf_path(home_dir)
+    play_service(home_dir, conf_path)
+    play_configuration(home_dir, conf_path)
   end
 end
