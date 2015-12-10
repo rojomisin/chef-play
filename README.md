@@ -64,7 +64,7 @@ See [play_test](https://github.com/dhoer/chef-play/tree/master/test/fixtures/coo
 for an example using play cookbook to install distribution artifacts as a service.
 
 The attributes descriptions below are for both resource and recipe 
-e.g., `servicename` and `node['play']['servicename']`.
+e.g., `servicename` or `node['play']['servicename']`.
 
 ### Attributes
 
@@ -105,7 +105,7 @@ play 'servicename' do
     '-J-Xmx512m',
     '-J-server'
   ])
-  action :dist
+  action :install
 end
 ```
 
@@ -124,6 +124,7 @@ play 'servicename' do
     '-J-Xmx512m',
     '-J-server'
   ])
+  action :install
 end
 ```
 
@@ -140,6 +141,7 @@ play 'sample_service' do
     '-J-Xmx512m',
     '-J-server'
   ])
+  action :install
 end
 ```
 
