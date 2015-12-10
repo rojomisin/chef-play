@@ -63,10 +63,10 @@ Note that application configuration template can also be external from distribut
 See [play_test](https://github.com/dhoer/chef-play/tree/master/test/fixtures/cookbooks/play_test) cookbook
 for an example using play cookbook to install distribution artifacts as a service.
 
+### Attributes
+
 The attributes descriptions below are for both resource and recipe 
 e.g., `servicename` or `node['play']['servicename']`.
-
-### Attributes
 
 * `servicename` - Service name to run as.  Defaults to name of resource block.
 * `source` - URI to archive (zip, tar.gz, or tgz) or directory path to exploded archive. 
