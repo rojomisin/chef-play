@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 SOURCE = 'https://github.com/dhoer/play-java-sample/releases/download/1.0/play-java-sample-1.0.zip'
-CONF_VARIABLES = { secret: 'testingonetwothree' }
+CONF_VARIABLES = { 'secret' => 'testingonetwothree' }
 SERVICENAME = 'sample_service'
 
 describe 'play::default' do
@@ -13,10 +13,6 @@ describe 'play::default' do
     end.converge(described_recipe)
   end
   let(:play_service_template) { chef_run.template('/etc/init.d/sample_service') }
-
-  it 'includes java recipe' do
-    expect(chef_run).to include_recipe('java_se::default')
-  end
 
   it 'install unzip package' do
     expect(chef_run).to install_package('unzip')

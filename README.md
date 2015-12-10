@@ -6,8 +6,8 @@
 [cookbook]: https://supermarket.chef.io/cookbooks/play
 [travis]: https://travis-ci.org/dhoer/chef-play
 
-Installs Play 2.2+ distribution artifact, created by the 
-[dist or universal:packageZipTarball task](https://www.playframework.com/documentation/2.5.x/Production#Using-the-dist-task), 
+Installs Play 2.2+ distribution artifact,
+[created by the dist or universal:packageZipTarball task](https://www.playframework.com/documentation/2.5.x/Production#Using-the-dist-task), 
 and configures it as a service.
 
 It is recommended that you include a `application.conf.erb` template file within the distribution artifact to configure 
@@ -18,7 +18,7 @@ To include the .erb file in your distribution artifact, copy `application.conf` 
 
 For example, replace `play.crypto.secret = "changeme"` with `play.crypto.secret = "<%= @secret %>"` in 
 `application.conf.erb` file, then pass the variable and its value using `conf_variables` 
-attribute of Play resource. The variable names in template must match variable names passed into `conf_variables`.
+attribute. The variable names in template must match variable names passed into `conf_variables`.
   
 So if `application.conf.erb` contained:
 
@@ -35,19 +35,7 @@ node.set['play']['conf_variables'] = { secret: 'abcdefghijk' }
 include_recipe 'play'
 ```
 
-Or Play resource was called with:
-
-```ruby
-play 'servicename' do
-  source 'https://example.com/dist/myapp-1.0.0.zip'
-  conf_variables(
-    secret: 'abcdefghijk'
-  )
-  action :install
-end
-```
-
-This would result in creating/overriding `application.conf` as:
+This would then result in creating/overriding `application.conf` with:
 
 ```ruby
 play.crypto.secret = "abcdefghijk"
@@ -73,7 +61,10 @@ Note that application configuration template can also be external from distribut
 ## Usage
 
 See [play_test](https://github.com/dhoer/chef-play/tree/master/test/fixtures/cookbooks/play_test) cookbook
-for an example using play cookbook to install distribution artifact as a service.
+for an example using play cookbook to install distribution artifacts as a service.
+
+The attributes descriptions below are for both resource and recipe 
+e.g., `servicename` and `node['play']['servicename']`.
 
 ### Attributes
 
@@ -89,14 +80,17 @@ not provided. Not needed if source is a directory.
 * `args` - Array of additional configuration arguments.  Default `[]`. 
 * `conf_variables` - Hash of application configuration variables required by .erb template. Default `{}`.
 * `conf_template` - Path to configuration template.  Path can be relative, or if the template file is outside dist 
-path, absolute.  If set to nil, no template processing will occur. Default `conf/application.conf.erb`.
+path, absolute.  If set to nil or template file not found, no template processing will occur. 
+Default `conf/application.conf.erb`.
 * `conf_path` - Path to application configuration file. Path can be relative, or if the config file is outside 
 standalone distribution, absolute. Default `conf/application.conf`.
 * `pid_dir` - The pid directory. Default `/var/run/play`.
 
 ### Examples
 
-To `install` a standalone distribution as service from remote archive:
+Examples below are using resource, but you can use the default recipe as well.
+
+#### Install a standalone distribution as service from remote archive
 
 ```ruby
 play 'servicename' do
@@ -111,11 +105,11 @@ play 'servicename' do
     '-J-Xmx512m',
     '-J-server'
   ])
-  action :install
+  action :dist
 end
 ```
 
-To `install` a standalone distribution as service from local file:
+#### Install a standalone distribution as service from local file
 
 ```ruby
 play 'servicename' do
@@ -130,11 +124,10 @@ play 'servicename' do
     '-J-Xmx512m',
     '-J-server'
   ])
-  action :install
 end
 ```
 
-To `install` a standalone distribution as service from exploded archive using provided application.conf as is:
+#### Install a standalone distribution as service using default application.conf as is
 
 ```ruby
 play 'sample_service' do
@@ -147,7 +140,6 @@ play 'sample_service' do
     '-J-Xmx512m',
     '-J-server'
   ])
-  action :install
 end
 ```
 

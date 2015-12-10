@@ -69,7 +69,7 @@ action :install do
 
     ark new_resource.servicename do
       url new_resource.source
-      checksum new_resource.checksum
+      checksum new_resource.checksum if new_resource.checksum
       version version
       owner new_resource.user
       not_if { ::File.directory?(new_resource.source) }
