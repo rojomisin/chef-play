@@ -80,7 +80,7 @@ not provided. Not needed if source is a directory.
 * `user` - User to run service as.  Default `play`.
 * `args` - Array of additional configuration arguments.  Default `[]`. 
 * `conf_variables` - Hash of application configuration variables required by .erb template. Leave empty
-to not process conf_template and use application configuration defined in conf_path as is.  Default `{}`.
+to not process conf_template and use application configuration defined in conf_path.  Default `{}`.
 * `conf_template` - Path to configuration template.  Path can be relative, or if the template file is outside dist 
 path, absolute.  If template file not found, no template processing will occur. 
 Default `conf/application.conf.erb`.
