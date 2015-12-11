@@ -54,7 +54,7 @@ def play_configuration(home_dir, conf_path)
     template_path = "#{home_dir}/#{new_resource.conf_template}"
   end
 
-  ruby_block 'verify conf_template can be run' do
+  ruby_block 'verify conf_template can be run' do # ~FC021
     block do
       fail("Play conf_template #{template_path} not found!")
     end
@@ -105,7 +105,7 @@ action :install do
       shell '/bin/false'
     end
 
-    ark new_resource.servicename do
+    ark new_resource.servicename do # ~FC021
       url new_resource.source
       checksum new_resource.checksum if new_resource.checksum
       version play_app_version
