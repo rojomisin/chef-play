@@ -1,0 +1,63 @@
+# Usage: KITCHEN_YAML=.kitchen.docker.yml kitchen list
+---
+settings:
+  parallel: true
+
+driver:
+  name: docker
+  # privileged is required otherwise the container doesn't boot right
+  privileged: true
+
+platforms:
+- name: centos-6
+  driver:
+    image: centos:6
+    platform: rhel
+    run_command: /sbin/init
+    provision_command:
+      - /usr/bin/yum install -y initscripts net-tools wget
+- name: centos-7
+  driver:
+    image: centos:7
+    platform: rhel
+    run_command: /usr/lib/systemd/systemd
+    provision_command:
+      - /bin/yum install -y initscripts net-tools wget
+- name: ubuntu-12.04
+  driver:
+    image: ubuntu-upstart:12.04
+    platform: ubuntu
+    disable_upstart: false
+    run_command: /sbin/init
+    provision_command:
+      - /usr/bin/apt-get update
+      - /usr/bin/apt-get install apt-transport-https net-tools -y
+- name: ubuntu-14.04
+  driver:
+    image: ubuntu-upstart:14.04
+    platform: ubuntu
+    disable_upstart: false
+    run_command: /sbin/init
+    provision_command:
+      - /usr/bin/apt-get update
+      - /usr/bin/apt-get install apt-transport-https net-tools -y
+
+suites:
+- name: default
+  run_list:
+    - recipe[play_test]
+  attributes: {
+    "play": {
+      "servicename": "sample_service",
+      "source": "https://github.com/dhoer/play-java-sample/releases/download/1.0/play-java-sample-1.0.zip",
+      "conf_variables": {
+        "secret": "mysecret"
+      },
+      "args": [
+        "-Dhttp.port=8080",
+        "-J-Xms128M",
+        "-J-Xmx512m",
+        "-J-server"
+      ]
+    }
+  }
