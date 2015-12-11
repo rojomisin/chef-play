@@ -54,7 +54,7 @@ def play_configuration(home_dir, conf_path)
     template_path = "#{home_dir}/#{new_resource.conf_template}"
   end
 
-  ruby_block 'verify conf template can be run' do
+  ruby_block 'verify conf_template can be run' do
     block do
       fail("Play conf_template #{template_path} not found!")
     end
@@ -93,10 +93,10 @@ end
 
 action :install do
   converge_by(new_resource) do
-    package 'unzip'
-
-    package 'rsync' do
-      only_if { node['platform_family'] == 'rhel' }
+    %w(unzip rsync).each do |pkg|
+      package "install play #{pkg} package dependency" do
+        package_name pkg
+      end
     end
 
     user new_resource.user do

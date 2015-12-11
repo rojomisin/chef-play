@@ -9,7 +9,6 @@ version '1.0.0'
 supports 'centos'
 supports 'redhat'
 supports 'ubuntu'
-supports 'debian'
 
 depends 'ark', '~> 0.9'
 

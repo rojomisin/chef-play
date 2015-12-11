@@ -37,6 +37,10 @@ describe 'play::default' do
     )
   end
 
+  it 'verifies conf_template exists' do
+    expect(chef_run).to run_ruby_block('verify conf_template can be run')
+  end
+
   describe 'service' do
     it 'creates pid directory' do
       expect(chef_run).to create_directory('/var/run/play').with(
