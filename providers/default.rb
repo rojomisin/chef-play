@@ -56,7 +56,7 @@ def play_configuration(home_dir, conf_path)
 
   ruby_block 'verify conf template can be run' do
     block do
-      raise("Play conf_template #{template_path} not found!")
+      fail("Play conf_template #{template_path} not found!")
     end
     only_if { !new_resource.conf_variables.empty? && !::File.exist?(template_path) }
   end
