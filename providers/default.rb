@@ -54,6 +54,13 @@ def play_configuration(home_dir, conf_path)
     template_path = "#{home_dir}/#{new_resource.conf_template}"
   end
 
+  ruby_block 'verify conf template can be run' do
+    block do
+      raise("Play conf_template #{template_path} not found!")
+    end
+    only_if { !new_resource.conf_variables.empty? && !::File.exist?(template_path) }
+  end
+
   # generate application.conf
   template conf_path do
     local true
@@ -61,7 +68,7 @@ def play_configuration(home_dir, conf_path)
     source template_path
     variables(new_resource.conf_variables)
     sensitive true
-    only_if { !new_resource.conf_variables.empty? && ::File.exist?(template_path) }
+    only_if { !new_resource.conf_variables.empty? }
     notifies :restart, "service[#{new_resource.servicename}]", :delayed
   end
 end

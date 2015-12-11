@@ -41,8 +41,10 @@ This would then result in creating/replacing `application.conf` file with:
 play.crypto.secret = "abcdefghijk"
 ```
 
-Note that conf_template path can also be external from distribution artifact. Leave conf_variable empty to skip 
-processing conf_template and use application configuration defined in conf_path.
+Also Note
+
+* Leaving `conf_variable` empty will skip template processing and use configuration defined in `conf_path`
+* The `conf_template` path can also be external from distribution artifact 
 
 ## Requirements
 
@@ -128,7 +130,7 @@ play 'sample_service' do
 end
 ```
 
-Since no conf_variables are passed, the application configuration defined in conf_path will be used as is.
+Since no conf_variables are passed, the application configuration defined in conf_path will be used.
 
 ## ChefSpec Matchers
 

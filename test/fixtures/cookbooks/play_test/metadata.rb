@@ -8,4 +8,5 @@ version '0.1.0'
 
 depends 'play'
 
+depends 'apt', '~> 2.9'
 depends 'java_se', '~> 8.0'

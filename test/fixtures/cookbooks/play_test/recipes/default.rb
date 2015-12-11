@@ -1,3 +1,4 @@
+include_recipe 'apt' if node['platform_family'] == 'debian'
 include_recipe 'java_se'
 
 # install zip file as sample_service on port 8080 using attributes passed via .kitchen.yml
