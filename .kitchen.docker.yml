@@ -1,4 +1,4 @@
-# Usage: KITCHEN_YAML=.kitchen.docker.yml kitchen list
+# Usage: KITCHEN_YAML=.kitchen.docker.yml eval "$(boot2docker shellinit)"; bundle exec kitchen list
 ---
 settings:
   parallel: true
@@ -22,6 +22,7 @@ platforms:
     platform: rhel
     run_command: /usr/lib/systemd/systemd
     provision_command:
+      - /bin/yum update
       - /bin/yum install -y initscripts net-tools wget
 - name: ubuntu-12.04
   driver:
