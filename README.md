@@ -35,7 +35,7 @@ node.set['play']['conf_variables'] = { secret: 'abcdefghijk' }
 include_recipe 'play'
 ```
 
-This would then result in creating/replacing `application.conf` file with:
+This would then result in creating/replacing `application.conf` file with value replaced:
 
 ```ruby
 play.crypto.secret = "abcdefghijk"
