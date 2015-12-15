@@ -10,8 +10,8 @@ Installs Play 2.2+ distribution artifact,
 [created by the dist or universal:packageZipTarball task](https://www.playframework.com/documentation/2.5.x/Production#Using-the-dist-task), 
 and configures it as a service.
 
-It is recommended that you include a `application.conf.erb` template file within the distribution artifact to configure 
-environment specific variables like application secret.  
+It is recommended that you include an `application.conf.erb` template file within the distribution artifact to 
+configure environment specific variables like application secret.  
  
 To include the .erb file in your distribution artifact, copy `application.conf` file and paste it as 
 `application.conf.erb` in the same directory. Then replace the environment specific values with variables. 
@@ -35,7 +35,7 @@ node.set['play']['conf_variables'] = { secret: 'abcdefghijk' }
 include_recipe 'play'
 ```
 
-This would then result in creating/replacing `application.conf` file with value replaced:
+This would then result in creating/replacing `application.conf` file with the variables replaced:
 
 ```ruby
 play.crypto.secret = "abcdefghijk"
@@ -43,8 +43,8 @@ play.crypto.secret = "abcdefghijk"
 
 Also Note
 
+* The `conf_template` path can be external from distribution artifact 
 * Leaving `conf_variable` empty will skip template processing and use configuration defined in `conf_path`
-* The `conf_template` path can also be external from distribution artifact 
 
 ## Requirements
 
@@ -112,7 +112,7 @@ play 'servicename' do
 end
 ```
 
-The application configuration defined in conf_path will be created or replaced by template defined in conf_template.
+The application configuration defined in conf_path will be created/replaced by template defined in conf_template.
 
 #### Install exploded standalone distribution as service and don't generate application.conf
 
