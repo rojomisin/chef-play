@@ -1,12 +1,13 @@
 require 'spec_helper'
 
-SOURCE = 'https://github.com/dhoer/play-java-sample/releases/download/1.0/play-java-sample-1.0.zip'
-CONF_VARIABLES = { 'secret' => 'testingonetwothree' }
-SERVICENAME = 'sample_service'
+SOURCE = 'https://github.com/dhoer/play-java-sample/releases/download/1.0/play-java-sample-1.0.zip'.freeze
+CONF_VARIABLES = { 'secret' => 'testingonetwothree' }.freeze
+SERVICENAME = 'sample_service'.freeze
 
 describe 'play::default' do
   let(:chef_run) do
-    ChefSpec::SoloRunner.new(platform: 'centos', version: '6.7', step_into: ['play']) do |node|
+    ChefSpec::SoloRunner.new(
+      platform: 'centos', version: '6.7', step_into: ['play'], file_cache_path: '/var/chef/cache') do |node|
       node.set['play']['servicename'] = SERVICENAME
       node.set['play']['source'] = SOURCE
       node.set['play']['conf_variables'] = CONF_VARIABLES

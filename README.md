@@ -6,9 +6,9 @@
 [cookbook]: https://supermarket.chef.io/cookbooks/play
 [travis]: https://travis-ci.org/dhoer/chef-play
 
-Installs Play 2.2+ distribution artifact,
-[created by the dist or universal:packageZipTarball task](https://www.playframework.com/documentation/2.5.x/Production#Using-the-dist-task), 
-and configures it as a service.
+Installs Play 2.2+ dist binary -
+created by the [dist or universal:packageZipTarball](https://www.playframework.com/documentation/2.5.x/Deploying#Using-the-dist-task) task 
+- and configures it as a service.
 
 It is recommended that you include an `application.conf.erb` template file within the distribution artifact to 
 configure environment specific variables like application secret.  
@@ -29,10 +29,13 @@ play.crypto.secret = "<%= @secret %>"
 And Play recipe was called with:
 
 ```ruby
-node.set['play']['servicename'] = 'servicename'
-node.set['play']['source'] = 'https://example.com/dist/myapp-1.0.0.zip'
-node.set['play']['conf_variables'] = { secret: 'abcdefghijk' }
-include_recipe 'play'
+play 'servicename' do
+  source 'https://example.com/dist/myapp-1.0.0.zip'
+  conf_variables(
+    secret: 'abcdefghijk'
+  )
+  action :install
+end
 ```
 
 This would then result in creating/replacing `application.conf` file with the variables replaced:
@@ -99,7 +102,7 @@ Examples below are using resource, but you can use the default recipe to do the 
 play 'servicename' do
   source 'file:///var/chef/cache/myapp-1.0.0.zip'
   conf_variables(
-    secret: 'mysecret'
+    secret: 'mysecret',
     langs: %w(en fr)
   )
   args([
@@ -150,7 +153,7 @@ expect(chef_run).to install_play('servicename').with(
       
 Cookbook Matchers
 
-- install_play(name)
+- install_play(servicename)
 
 ## Getting Help
 

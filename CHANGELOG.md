@@ -1,9 +1,13 @@
-# Play Framework Changelog
+# Play Changelog
 
-## 1.0.1
+## 1.0.2 2016-04-01
+
+- Fix #2 Exploded standalone distribution results in undefined method '[]' for nil:NilClass error 
+
+## 1.0.1 2015-12-11
 
 - Suppress FC021: Resource condition in provider may not behave as expected
 
-## 1.0.0
+## 1.0.0 2015-12-07
 
 - Initial release

@@ -5,13 +5,20 @@ end
 use_inline_resources
 
 def play_service(home_dir, conf_path)
-  project_name = play_project_name
-
   # create pid directory
   directory new_resource.pid_dir do
     owner new_resource.user
     group new_resource.user
     mode 0755
+  end
+
+  project_name = play_project_name
+
+  ruby_block 'verify executable exists' do
+    block do
+      raise "Play executable #{home_dir}/bin/#{project_name} not found!"
+    end
+    not_if { ::File.exist?("#{home_dir}/bin/#{project_name}") }
   end
 
   # make play script executable
@@ -48,15 +55,12 @@ end
 
 def play_configuration(home_dir, conf_path)
   # make template path absolute, if relative
-  if new_resource.conf_template =~ %r{^/}
-    template_path = new_resource.conf_template
-  else
-    template_path = "#{home_dir}/#{new_resource.conf_template}"
-  end
+  template_path =
+    new_resource.conf_template =~ %r{^/} ? new_resource.conf_template : "#{home_dir}/#{new_resource.conf_template}"
 
   ruby_block 'verify conf_template can be run' do # ~FC021
     block do
-      fail("Play conf_template #{template_path} not found!")
+      raise("Play conf_template #{template_path} not found!")
     end
     only_if { !new_resource.conf_variables.empty? && !::File.exist?(template_path) }
   end
@@ -75,12 +79,16 @@ end
 
 def play_project_name
   return new_resource.project_name if new_resource.project_name
-  (new_resource.source).match(%r{.*/(.*)-[0-9].*})[1] # http://rubular.com/r/X9PUgZl0UW
+  new_resource.source.match(%r{.*/(.*)-[0-9].*})[1] # http://rubular.com/r/X9PUgZl0UW
+rescue
+  raise 'Play project_name not defined!'
 end
 
 def play_app_version
   return new_resource.version if new_resource.version
-  (new_resource.source).match(/-([\d|.(-SNAPSHOT)]*)[-|.]/)[1] # http://rubular.com/r/KN2ILF3mj3
+  new_resource.source.match(/-([\d|.(-SNAPSHOT)]*)[-|.]/)[1] # http://rubular.com/r/KN2ILF3mj3
+rescue
+  '1' # default version to 1
 end
 
 def play_home_dir
