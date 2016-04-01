@@ -6,9 +6,9 @@
 [cookbook]: https://supermarket.chef.io/cookbooks/play
 [travis]: https://travis-ci.org/dhoer/chef-play
 
-Installs Play 2.2+ dist binary -
-created by the [dist or universal:packageZipTarball](https://www.playframework.com/documentation/2.5.x/Deploying#Using-the-dist-task) task 
-- and configures it as a service.
+Installs Play 2.2+ dist binary
+(created by the [dist or universal:packageZipTarball](https://www.playframework.com/documentation/2.5.x/Deploying#Using-the-dist-task) task) 
+and configures it as a service.
 
 It is recommended that you include an `application.conf.erb` template file within the distribution artifact to 
 configure environment specific variables like application secret.  
