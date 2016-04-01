@@ -10,7 +10,7 @@ supports 'centos'
 supports 'redhat'
 supports 'ubuntu'
 
-depends 'ark', '~> 0.9'
+depends 'ark', '~> 1.0'
 
 source_url 'https://github.com/dhoer/chef-play' if respond_to?(:source_url)
 issues_url 'https://github.com/dhoer/chef-play/issues' if respond_to?(:issues_url)
