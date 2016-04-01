@@ -31,6 +31,10 @@ describe 'play::default' do
     expect(chef_run).to install_ark('sample_service')
   end
 
+  it 'verifies executable exists' do
+    expect(chef_run).to run_ruby_block('verify executable exists')
+  end
+
   it 'runs play install action' do
     expect(chef_run).to install_play(SERVICENAME).with(
       source: SOURCE,
