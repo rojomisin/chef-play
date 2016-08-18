@@ -179,8 +179,8 @@ action :install do
 
     template "/etc/init.d/#{service_name}" do
       cookbook 'play'
-      source "#{node['platform_family']}.init.erb"
-      mode 0o755
+      source 'systemv.erb'
+      mode '0755'
       variables(
         name: service_name,
         home: home_dir,

@@ -10,56 +10,6 @@ Installs Play 2.2+ tar.gz, tgz, or zip
 [standalone distribution](https://www.playframework.com/documentation/2.5.x/Deploying#Using-the-dist-task) 
 and configures it as a service.
 
-It is recommended that you include an `application.conf.erb` template file within the distribution artifact to 
-configure environment specific variables like application secret.  
- 
-To include the .erb file in your distribution artifact, copy `application.conf` file and paste it as 
-`application.conf.erb` in the same directory. Then replace the environment specific values with variables. 
-
-For example, replace `play.crypto.secret = "changeme"` with `play.crypto.secret = "<%= @secret %>"` in 
-`application.conf.erb` file, then pass the variable and its value using `conf_variables` 
-attribute. The variable names in template must match variable names passed into `conf_variables`.
-  
-So if `application.conf.erb` contained:
-
-```ruby
-play.crypto.secret = "<%= @secret %>"
-```
-
-And Play recipe was called with conf_local as true:
-
-```ruby
-play 'https://example.com/dist/myapp-1.0.0.zip' do
-  conf_local true
-  conf_source 'conf/application.conf.erb'
-  conf_variables(
-    secret: 'abcdefghijk'
-  )
-  action :install
-end
-```
-
-This would then result in creating/replacing `application.conf` file with the variables replaced:
-
-```ruby
-play.crypto.secret = "abcdefghijk"
-```
-
-But if you prefer having the template in your own cookbook, e.g., 'mycookbook' then provide cookbook name and source:
-
-```ruby
-play 'https://example.com/dist/myapp-1.0.0.zip' do
-  conf_cookbook 'mycookbook
-  conf_source 'application.conf.erb' 
-  conf_variables(
-    secret: 'abcdefghijk'
-  )
-  action :install
-end
-```
-
-Leaving both conf_local false and conf_cookbook nil will skip the application conf template process.
-
 ## Requirements
 
 - Java (must be installed outside this cookbook)
@@ -72,10 +22,11 @@ Leaving both conf_local false and conf_cookbook nil will skip the application co
 
 # Usage
 
-See [play_test](https://github.com/dhoer/chef-play/blob/master/test/fixtures/cookbooks/play_test/recipes/default.rb)
-cookbook for an example using play cookbook to install distribution as a service.
-
-Note that pid file will default to `/var/run/#{service_name}/play.pid`.
+Installs standalone distribution and configures it as a systemd or systemv service. The application.conf file can be
+created/overwritten with a template 
+[included in distribution](https://github.com/dhoer/chef-play/wiki/Creating-a-local-template) or by an external 
+template from another cookbook.  The servicename will default to the project name of the distribution if none is 
+provided. The pid path will default to `/var/run/#{service_name}/play.pid`.
 
 ### Attributes
 
