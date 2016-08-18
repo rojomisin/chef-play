@@ -2,7 +2,9 @@ include_recipe 'apt' if node['platform_family'] == 'debian'
 include_recipe 'java_se'
 
 # install zip file as sample_service on port 8080 using attributes passed via .kitchen.yml
-play 'https://github.com/dhoer/play-java-sample/releases/download/1.0/play-java-sample-1.0.zip'
+play 'https://github.com/dhoer/play-java-sample/releases/download/1.0/play-java-sample-1.0.zip' do
+
+end
 
 #
 # # install tarball as sample_service2 on default port 9000

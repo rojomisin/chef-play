@@ -1,10 +1,10 @@
 source 'https://rubygems.org'
 
-gem 'foodcritic', '~> 5.0'
-gem 'rubocop', '~> 0.32'
-gem 'chefspec', '~> 4.4'
-gem 'chef', '~> 11.18'
-gem 'berkshelf', '~> 3.1.5'
+gem 'foodcritic'
+gem 'rubocop'
+gem 'chefspec'
+gem 'chef', '~> 12.0'
+gem 'berkshelf', '~> 4.0'
 
 group :integration do
   gem 'serverspec', '~> 2.24'
