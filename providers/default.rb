@@ -196,6 +196,6 @@ action :install do
   end unless platform?('windows')
 
   service service_name do
-    action [:enable, :start]
+    action :enable
   end
 end

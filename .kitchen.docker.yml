@@ -67,7 +67,7 @@ suites:
 - name: default
   run_list:
     - play_test::default
-    - play_test::tar
+    - play_test::tarball
   attributes:
     play:
       sensitive: false

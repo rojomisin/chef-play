@@ -4,9 +4,9 @@ require 'serverspec'
 set :backend, :exec
 
 describe 'dist zip' do
-  describe file('/opt/kitchen/cache/play-java-sample-1.0.zip') do
-    it { should be_file }
-  end
+  # describe file('/opt/kitchen/cache/play-java-sample-1.0.zip') do
+  #   it { should be_file }
+  # end
 
   describe user('play') do
     it { should exist }
