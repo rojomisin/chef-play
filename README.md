@@ -13,7 +13,7 @@ Installs Play 2.2+
 ## Requirements
 
 - Java (must be installed outside this cookbook)
-- Chef 11+
+- Chef 12+
 
 ### Platforms
 
@@ -22,11 +22,12 @@ Installs Play 2.2+
 
 # Usage
 
-Installs Play 2.2+ standalone distribution and configures it as a systemd or systemv service. The application.conf 
-file can be created/overwritten with a template 
+Installs Play 2.2+ standalone distribution and configures it as a systemd or systemv service. The servicename will 
+default to the project_name of the distribution if none is provided. The application.conf file can be 
+created/overwritten with a template 
 [included in the distribution](https://github.com/dhoer/chef-play/wiki/Creating-a-local-template) or by an external 
-template from another cookbook.  The servicename will default to the project_name of the distribution if none is 
-provided. For Linux users, zip files do not retain Linux file permissions so when the file is expanded the start 
+template from another cookbook.  The application configuration defined in conf_path is what the service will use.  
+For Linux users, zip files do not retain Linux file permissions so when the file is expanded the start 
 script will be set as an executable. The pid path for Linux users will default to `/var/run/#{servicename}/play.pid`.
 
 ### Attributes
