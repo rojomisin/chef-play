@@ -4,7 +4,7 @@ require 'serverspec'
 set :backend, :exec
 
 describe 'dist tgz' do
-  describe file('/tmp/kitchen/cache/play-java-sample-1.0.tgz') do
+  describe file('/opt/kitchen/cache/play-java-sample-1.0.tgz') do
     it { should be_file }
   end
 
@@ -89,16 +89,16 @@ describe 'dist tgz' do
     end
   end
 
-  describe service('play-java-sample') do
+  describe service('play-java-sample-tar') do
     it { should be_enabled } unless os[:family] == 'debian'
     it { should be_running }
   end
 
-  describe port(9000) do
+  describe port(8080) do
     it { should be_listening }
   end
 
-  describe command('wget -O - localhost:9000') do
+  describe command('wget -O - localhost:8080') do
     its(:stdout) { should match(%r{<h1>Your new application is ready.<\/h1>}) }
   end
 end
