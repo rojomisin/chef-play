@@ -1,4 +1,3 @@
-include_recipe 'apt' if node['platform_family'] == 'debian'
 include_recipe 'java_se'
 
 play 'https://github.com/dhoer/play-java-sample/releases/download/1.0/play-java-sample-1.0.zip' do

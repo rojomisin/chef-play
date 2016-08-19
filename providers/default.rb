@@ -76,7 +76,6 @@ action :install do
 
   user usr do # ~FC021
     comment 'Play Framework User'
-    home new_resource.path
     shell '/bin/false'
     password new_resource.password
     system true
@@ -168,6 +167,7 @@ action :install do
         group: grp,
         config: conf_path
       )
+      mode '0755'
       notifies(:restart, "service[#{service_name}]")
     end
   else
