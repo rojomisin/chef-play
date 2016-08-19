@@ -13,28 +13,28 @@ describe 'dist zip' do
     it { should belong_to_group 'play' }
   end
 
-  describe file('/opt/play/play-java-sample-1.0') do
+  describe file('/opt/play/zip/play-java-sample-1.0') do
     it { should be_directory }
     it { should be_mode 755 }
     it { should be_owned_by 'play' }
     it { should be_grouped_into 'play' }
   end
 
-  describe file('/opt/play/play-java-sample') do
-    it { should be_linked_to '/opt/play/play-java-sample-1.0' }
+  describe file('/opt/play/zip/play-java-sample') do
+    it { should be_linked_to '/opt/play/zip/play-java-sample-1.0' }
     it { should be_mode 777 }
     it { should be_owned_by 'play' }
     it { should be_grouped_into 'play' }
   end
 
-  describe file('/opt/play/play-java-sample/bin/play-java-sample') do
+  describe file('/opt/play/zip/play-java-sample/bin/play-java-sample') do
     it { should be_file }
     it { should be_mode 755 }
     it { should be_owned_by 'play' }
     it { should be_grouped_into 'play' }
   end
 
-  describe file('/opt/play/play-java-sample/conf/application.conf') do
+  describe file('/opt/play/zip/play-java-sample/conf/application.conf') do
     it { should be_file }
     it { should be_mode 600 }
     it { should be_owned_by 'play' }
@@ -48,7 +48,7 @@ describe 'dist zip' do
     it { should be_grouped_into 'play' }
   end
 
-  # describe file('/etc/init.d/sample_service') do
+  # describe file('/etc/init.d/play-java-sample') do
   #   it { should be_file }
   #   it { should be_mode 755 }
   #   it { should be_owned_by 'root' }
