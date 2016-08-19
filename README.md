@@ -6,9 +6,9 @@
 [cookbook]: https://supermarket.chef.io/cookbooks/play
 [travis]: https://travis-ci.org/dhoer/chef-play
 
-Installs Play 2.2+ tar.gz, tgz, or zip 
+Installs Play 2.2+ 
 [standalone distribution](https://www.playframework.com/documentation/2.5.x/Deploying#Using-the-dist-task) 
-and configures it as a service.
+(tar.gz, tgz, or zip) and configures it as a service.
 
 ## Requirements
 
@@ -22,11 +22,12 @@ and configures it as a service.
 
 # Usage
 
-Installs standalone distribution and configures it as a systemd or systemv service. The application.conf file can be
-created/overwritten with a template 
-[included in distribution](https://github.com/dhoer/chef-play/wiki/Creating-a-local-template) or by an external 
-template from another cookbook.  The servicename will default to the project name of the distribution if none is 
-provided. The pid path will default to `/var/run/#{service_name}/play.pid`.
+Installs Play 2.2+ standalone distribution and configures it as a systemd or systemv service. The application.conf 
+file can be created/overwritten with a template 
+[included in the distribution](https://github.com/dhoer/chef-play/wiki/Creating-a-local-template) or by an external 
+template from another cookbook.  The servicename will default to the project_name of the distribution if none is 
+provided. For Linux users, zip files do not retain Linux file permissions so when the file is expanded the start 
+script will be set as an executable. The pid path for Linux users will default to `/var/run/#{servicename}/play.pid`.
 
 ### Attributes
 
@@ -126,7 +127,14 @@ expect(chef_run).to install_play(
   conf_path 'conf/application.conf'
   conf_variables: {
     secret: 'abcdefghijk'
+    langs: %w(en fr)
   }
+  args: [
+    '-Dhttp.port=8080',
+    '-J-Xms128m',
+    '-J-Xmx512m',
+    '-J-server' 
+  ]
 )
 ```
  
