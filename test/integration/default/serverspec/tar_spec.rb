@@ -49,8 +49,8 @@ describe 'dist tgz' do
   end
 
   if (os[:family] == 'redhat' && os[:release].split('.')[0].to_i < 7) ||
-    (os[:family] == 'debian' && os[:release].split('.')[0].to_i < 8) ||
-    (os[:family] == 'ubuntu' && os[:release].split('.')[0].to_i < 15)
+     (os[:family] == 'debian' && os[:release].split('.')[0].to_i < 8) ||
+     (os[:family] == 'ubuntu' && os[:release].split('.')[0].to_i < 15)
     describe file('/etc/init.d/play-java-sample-tar') do # systemv
       it { should be_file }
       it { should be_mode 755 }
@@ -72,17 +72,19 @@ describe 'dist tgz' do
       it { should be_mode 755 }
       it { should be_owned_by 'root' }
       it { should be_grouped_into 'root' }
-      its(:content) { should match(%r{Description=Play play-java-sample-tar service}) }
+      its(:content) { should match(/Description=Play play-java-sample-tar service/) }
       its(:content) { should match(%r{PIDFile=/var/run/play-java-sample-tar/play.pid}) }
       its(:content) { should match(%r{WorkingDirectory=/opt/play/tar/play-java-sample-tar}) }
       its(:content) { should match(/User=play/) }
       its(:content) { should match(/Group=play/) }
       its(:content) { should match(%r{ExecStartPre=-/usr/bin/mkdir /var/run/play-java-sample-tar}) }
       its(:content) { should match(%r{ExecStartPre=/usr/bin/chown -R play:play /var/run/play-java-sample-tar}) }
-      its(:content) { should match(%r{ExecStart=/opt/play/tar/play-java-sample-tar/bin/play-java-sample \
+      its(:content) do
+        should match(%r{ExecStart=/opt/play/tar/play-java-sample-tar/bin/play-java-sample \
 -Dpidfile.path=/var/run/play-java-sample-tar/play.pid \
 -Dconfig.file=/opt/play/tar/play-java-sample-tar/conf/application.conf \
--Dhttp.port=8080 -J-Xms128M -J-Xmx512m -J-server}) }
+-Dhttp.port=8080 -J-Xms128M -J-Xmx512m -J-server})
+      end
       its(:content) { should match(%r{ExecStopPost=/bin/rm -f /var/run/play-java-sample-tar/play.pid}) }
     end
   end
