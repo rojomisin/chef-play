@@ -17,8 +17,8 @@ Installs Play 2.2+
 
 ### Platforms
 
-- Centos/RedHat
-- Ubuntu 
+- CentOS, Red Hat, Fedora
+- Debian, Ubuntu
 
 # Usage
 

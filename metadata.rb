@@ -9,5 +9,7 @@ issues_url 'https://github.com/dhoer/chef-play/issues' if respond_to?(:issues_ur
 version '2.0.0'
 
 supports 'centos'
+supports 'debian'
+supports 'fedora'
 supports 'redhat'
 supports 'ubuntu'
