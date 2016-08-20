@@ -68,7 +68,6 @@ suites:
   run_list:
     - play_test::default
     - play_test::tarball
-    - play_test::wait
   attributes:
     play:
       sensitive: false
