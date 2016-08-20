@@ -48,8 +48,8 @@ describe 'dist zip' do
     it { should be_grouped_into 'play' }
   end
 
-  if (os[:family] == 'redhat' && os[:release].split('.')[0].to_i < 7) ||
-     (os[:family] == 'ubuntu' && os[:release].split('.')[0].to_i < 15)
+  if (os[:family] == 'redhat' && !os[:release].nil? && os[:release].split('.')[0].to_i < 7) ||
+     (os[:family] == 'ubuntu' && !os[:release].nil? && os[:release].split('.')[0].to_i < 15)
     describe file('/etc/init.d/play-java-sample') do
       it { should be_file }
       it { should be_mode 755 }
