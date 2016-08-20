@@ -98,7 +98,7 @@ describe 'dist tgz' do
     it { should be_listening }
   end
 
-  describe command('wget -O - 127.0.0.1:8080') do
+  describe command('wget -O - localhost:8080') do
     its(:stdout) { should match(%r{<h1>Your new application is ready.<\/h1>}) }
   end
 end
