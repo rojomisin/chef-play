@@ -101,11 +101,11 @@ describe 'dist zip' do
     its(:stderr) { should match(/dfsadf/) }
   end
 
-  describe command('sudo systemdctl restart play-java-sample') do
+  describe command('systemctl restart play-java-sample') do
     its(:stdout) { should match(/dfsadf/) }
     its(:stderr) { should match(/dfsadf/) }
   end
-  describe command('sudo journalctl -xe') do
+  describe command('journalctl -xe') do
     its(:stdout) { should match(/dfsadf/) }
     its(:stderr) { should match(/dfsadf/) }
   end
