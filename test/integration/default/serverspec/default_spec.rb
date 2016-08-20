@@ -96,7 +96,7 @@ describe 'dist zip' do
     it { should be_listening }
   end
 
-  describe command('wget -O - localhost:9000') do
+  describe command('wget -O - 127.0.0.1:9000') do
     its(:stdout) { should match(%r{<h1>Your new application is ready.<\/h1>}) }
   end
 end
