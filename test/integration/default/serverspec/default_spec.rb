@@ -98,5 +98,15 @@ describe 'dist zip' do
 
   describe command('wget -O - localhost:9000') do
     its(:stdout) { should match(%r{<h1>Your new application is ready.<\/h1>}) }
+    its(:stdout) { should match(%r{dfsadf}) }
+  end
+
+  describe command('sudo systemdctl restart play-java-sample') do
+    its(:stdout) { should match(%r{<h1>Your new application is ready.<\/h1>}) }
+    its(:stdout) { should match(%r{dfsadf}) }
+  end
+  describe command('sudo journalctl -xe') do
+    its(:stdout) { should match(%r{dsfasfas}) }
+    its(:stdout) { should match(%r{dfsadf}) }
   end
 end
