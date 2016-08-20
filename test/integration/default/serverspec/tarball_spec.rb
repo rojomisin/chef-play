@@ -93,8 +93,8 @@ describe 'dist tgz' do
     it { should be_running }
   end
 
-  describe port(8080) do
-    it { should be_listening } unless os[:family] == 'redhat'
+  describe port(9000), if: !%w(redhat fedora).include?(os[:family]) do
+    it { should be_listening }
   end
 
   describe command('wget -O - localhost:8080') do
