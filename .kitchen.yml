@@ -33,6 +33,7 @@ platforms:
 suites:
 - name: default
   run_list:
+    - java_se::default
     - play_test::default
     - play_test::tarball
   attributes:
