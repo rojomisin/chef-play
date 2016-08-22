@@ -80,7 +80,7 @@ describe 'dist zip' do
       its(:content) { should match(%r{ExecStopPost=/bin/rm -f /var/run/play-java-sample/play.pid}) }
     end
   when 'upstart'
-    describe file('/etc/init/play-java-sample') do
+    describe file('/etc/init/play-java-sample.conf') do
       it { should be_file }
       it { should be_mode 755 }
       it { should be_owned_by 'root' }

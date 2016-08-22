@@ -174,7 +174,7 @@ action :install do
       notifies(:restart, "service[#{service_name}]")
     end
   when 'upstart'
-    template "/etc/init/#{service_name}" do
+    template "/etc/init/#{service_name}.conf" do
       source 'upstart.erb'
       cookbook 'play'
       variables vars
