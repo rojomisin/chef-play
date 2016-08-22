@@ -74,10 +74,14 @@ describe 'dist tgz' do
       its(:content) { should match(/Description=Play play-java-sample-tar service/) }
       its(:content) { should match(%r{PIDFile=/var/run/play-java-sample-tar/play.pid}) }
       its(:content) { should match(%r{WorkingDirectory=/opt/play/tar/play-java-sample-tar}) }
-      its(:content) { should match(/User=play/) }
-      its(:content) { should match(/Group=play/) }
+      its(:content) { should match(/User=play-java-sample-tar/) }
+      its(:content) { should match(/Group=play-java-sample-tar/) }
       its(:content) { should match(%r{ExecStartPre=/bin/mkdir -p /var/run/play-java-sample-tar}) }
-      its(:content) { should match(%r{ExecStartPre=/bin/chown -R play:play /var/run/play-java-sample-tar}) }
+      its(:content) do
+        should match(
+          %r{ExecStartPre=/bin/chown -R play-java-sample-tar:play-java-sample-tar /var/run/play-java-sample-tar}
+        )
+      end
       its(:content) do
         should match(%r{ExecStart=/opt/play/tar/play-java-sample-tar/bin/play-java-sample \
 -Dpidfile.path=/var/run/play-java-sample-tar/play.pid \

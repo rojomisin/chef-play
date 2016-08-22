@@ -74,10 +74,14 @@ describe 'dist zip' do
       its(:content) { should match(/Description=Play play-java-sample service/) }
       its(:content) { should match(%r{PIDFile=/var/run/play-java-sample/play.pid}) }
       its(:content) { should match(%r{WorkingDirectory=/opt/play/zip/play-java-sample}) }
-      its(:content) { should match(/User=play/) }
-      its(:content) { should match(/Group=play/) }
+      its(:content) { should match(/User=play-java-sample/) }
+      its(:content) { should match(/Group=play-java-sample/) }
       its(:content) { should match(%r{ExecStartPre=/bin/mkdir -p /var/run/play-java-sample}) }
-      its(:content) { should match(%r{ExecStartPre=/bin/chown -R play:play /var/run/play-java-sample}) }
+      its(:content) do
+        should match(
+          %r{ExecStartPre=/bin/chown -R play-java-sample:play-java-sample /var/run/play-java-sample}
+        )
+      end
       its(:content) do
         should match(%r{ExecStart=/opt/play/zip/play-java-sample/bin/play-java-sample \
 -Dpidfile.path=/var/run/play-java-sample/play.pid -Dconfig.file=/opt/play/zip/play-java-sample/conf/application.conf \
