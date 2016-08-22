@@ -69,8 +69,8 @@ describe 'dist tgz' do
       its(:content) { should match(%r{ExecStartPre=/bin/mkdir -p /var/run/play-java-sample-tar}) }
       its(:content) do
         should match(
-                 %r{ExecStartPre=/bin/chown -R play-java-sample-tar:play-java-sample-tar /var/run/play-java-sample-tar}
-               )
+          %r{ExecStartPre=/bin/chown -R play-java-sample-tar:play-java-sample-tar /var/run/play-java-sample-tar}
+        )
       end
       its(:content) do
         should match(%r{ExecStart=/opt/play/tar/play-java-sample-tar/bin/play-java-sample \
