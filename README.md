@@ -26,9 +26,9 @@ Installs Play 2.2+ standalone distribution and configures it as a systemd or sys
 default to the project_name of the distribution if none is provided. The application.conf file can be 
 created/overwritten with a template 
 [included in the distribution](https://github.com/dhoer/chef-play/wiki/Creating-a-local-template) or by an external 
-template from another cookbook.  The application configuration defined in conf_path is what the service will use.  
-For Linux users, zip files do not retain Linux file permissions so when the file is expanded the start 
-script will be set as an executable. The pid path for Linux users will default to `/var/run/#{servicename}/play.pid`.
+template from another cookbook.  For Linux users, zip files do not retain Linux file permissions so when the file is 
+expanded the start script will be set as an executable. The pid path for Linux users will default to 
+`/var/run/#{servicename}/play.pid`.
 
 ### Attributes
 
