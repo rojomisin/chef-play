@@ -1,0 +1,19 @@
+[Unit]
+Description=Play <%= @name %> service
+After=network.target
+
+[Service]
+PIDFile=<%= @pid_dir %>/play.pid
+WorkingDirectory=<%= @home %>
+User=<%= @user %>
+Group=<%= @group %>
+PermissionsStartOnly=true
+ExecStartPre=/bin/mkdir -p <%= @pid_dir %>
+ExecStartPre=/bin/chown -R <%= @user %>:<%= @group %> <%= @pid_dir %>
+ExecStart=<%= @exec %> -Dpidfile.path=<%= @pid_dir %>/play.pid -Dconfig.file=<%= @config %> <%= @args %>
+ExecStop=/bin/kill $MAINPID
+ExecStopPost=/bin/rm -f <%= @pid_dir %>/play.pid
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

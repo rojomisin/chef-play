@@ -1,11 +1,2 @@
-default['play']['servicename'] = nil
-default['play']['source'] = nil
-default['play']['checksum'] = nil
-default['play']['project_name'] = nil
-default['play']['version'] = nil
-default['play']['user'] = 'play'
-default['play']['args'] = []
-default['play']['conf_variables'] = {}
-default['play']['conf_template'] = 'conf/application.conf.erb'
-default['play']['conf_path'] = 'conf/application.conf'
-default['play']['pid_dir'] = '/var/run/play'
+default['play']['path'] = platform?('windows') ? "#{ENV['SYSTEMDRIVE']}/play" : '/opt/play'
+default['play']['sensitive'] = true

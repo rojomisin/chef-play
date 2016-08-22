@@ -6,103 +6,60 @@
 [cookbook]: https://supermarket.chef.io/cookbooks/play
 [travis]: https://travis-ci.org/dhoer/chef-play
 
-Installs Play 2.2+ dist binary
-(created by the [dist or universal:packageZipTarball](https://www.playframework.com/documentation/2.5.x/Deploying#Using-the-dist-task) task) 
-and configures it as a service.
-
-It is recommended that you include an `application.conf.erb` template file within the distribution artifact to 
-configure environment specific variables like application secret.  
- 
-To include the .erb file in your distribution artifact, copy `application.conf` file and paste it as 
-`application.conf.erb` in the same directory. Then replace the environment specific values with variables. 
-
-For example, replace `play.crypto.secret = "changeme"` with `play.crypto.secret = "<%= @secret %>"` in 
-`application.conf.erb` file, then pass the variable and its value using `conf_variables` 
-attribute. The variable names in template must match variable names passed into `conf_variables`.
-  
-So if `application.conf.erb` contained:
-
-```ruby
-play.crypto.secret = "<%= @secret %>"
-```
-
-And Play recipe was called with:
-
-```ruby
-play 'servicename' do
-  source 'https://example.com/dist/myapp-1.0.0.zip'
-  conf_variables(
-    secret: 'abcdefghijk'
-  )
-  action :install
-end
-```
-
-This would then result in creating/replacing `application.conf` file with the variables replaced:
-
-```ruby
-play.crypto.secret = "abcdefghijk"
-```
-
-Also Note
-
-* The `conf_template` path can be external from distribution artifact 
-* Leaving `conf_variable` empty will skip template processing and use configuration defined in `conf_path`
+Installs Play 2.2+ 
+[standalone distribution](https://www.playframework.com/documentation/2.5.x/Deploying#Using-the-dist-task) 
+(tar.gz, tgz, or zip) and configures it as a service.
 
 ## Requirements
 
 - Java (must be installed outside this cookbook)
-- Chef 11+
+- Chef 12+
 
 ### Platforms
 
-- Centos/RedHat
-- Ubuntu 
+- CentOS, Red Hat, Fedora
+- Debian, Ubuntu
 
-### Cookbooks
+# Usage
 
-- ark
-
-## Usage
-
-See [play_test](https://github.com/dhoer/chef-play/blob/master/test/fixtures/cookbooks/play_test/recipes/default.rb)
-cookbook for an example using play cookbook to install distribution artifacts as a service.
+Installs Play 2.2+ standalone distribution and configures it as a systemd or systemv service. The servicename will 
+default to the project_name of the distribution if none is provided. The application.conf file can be 
+created/overwritten with a template 
+[included in the distribution](https://github.com/dhoer/chef-play/wiki/Creating-a-local-template) or by an external 
+template from another cookbook.  For Linux users, zip files do not retain Linux file permissions so when the file is 
+expanded the start script will be set as an executable. The pid path for Linux users will default to 
+`/var/run/#{servicename}/play.pid`.
 
 ### Attributes
 
-The attributes descriptions are for both resource and recipe e.g., `servicename` or `node['play']['servicename']`.
-
-* `servicename` - Service name to run as.  Defaults to name of resource block.
-* `source` - URI to archive (zip, tar.gz, or tgz) or directory path to exploded archive. 
-* `checksum` - The SHA-256 checksum of the file. Use to prevent resource from re-downloading a file. 
-When  local file matches the checksum, the chef-client will not download it.
-* `project_name` - Used to identify start script executable.  Defaults to project name derived from standalone 
-distribution filename, if not provided.
-* `version` - Version of application.  Defaults to version derived from standalone distribution filename, if 
-not provided. Not needed if source is a directory.
-* `user` - User to run service as.  Default `play`.
-* `args` - Array of additional configuration arguments.  Default `[]`. 
-* `conf_variables` - Hash of application configuration variables required by .erb template. Leave empty
-to not process conf_template and use application configuration defined in conf_path.  Default `{}`.
-* `conf_template` - Path to configuration template.  Path can be relative, or if the template file is outside dist 
-path, absolute.  If template file not found, no template processing will occur. 
-Default `conf/application.conf.erb`.
+* `source` - URI to archive (tar.gz, tgz, or zip) or directory path to exploded archive. Defaults to resource name.
+* `checksum` - The SHA-256 checksum of the file. Use to prevent resource from re-downloading remote file. Default `nil`. 
+* `project_name` - Used to identify start script executable.  Derives project_name from standalone distribution 
+filename when nil. Default `nil`
+* `servicename` - Service name to run as.  Defaults to project_name when nil. Default `nil`.
+* `conf_cookbook` -  Cookbook containing application conf template to use. Default `nil`.
+* `conf_local` -  Load application conf template from a local path. Default `false`.
+* `conf_source` -  Path to configuration template.  Local path can be relative, or if the template file is outside 
+standalone distribution, absolute. Default `nil`. 
 * `conf_path` - Path to application configuration file. Path can be relative, or if the config file is outside 
-standalone distribution, absolute. Default `conf/application.conf`.
-* `pid_dir` - The pid directory. Default `/var/run/play`.
+standalone distribution, absolute. Default `conf/application.conf`. 
+* `conf_variables` - Hash of application configuration variables required by application conf template. Default `{}`.
+* `args` - Array of additional configuration arguments.  Default `[]`. 
+* `user` - Creates a user using servicename when nil or uses value passed in. Default `nil`.
+* `group` - Creates a group using servicename when nil or uses value passed in. Default `nil`.
+* `path` - Path to install standalone distribution. Default `/opt/play`. 
+* `sensitive` - Suppress output. Default `true`.
 
 ### Examples
 
-Examples below are using resource, but you can use the default recipe to do the same thing as well.
-
-
-#### Install a standalone distribution as service from local file and generate application.conf
+#### Install distribution as service and generate application.conf from template included in the distribution
 
 ```ruby
-play 'servicename' do
-  source 'file:///var/chef/cache/myapp-1.0.0.zip'
+play 'https://github.com/dhoer/play-java-sample/releases/download/1.0/play-java-sample-1.0.zip' do
+  conf_local true 
+  conf_source 'conf/application.conf.erb'
   conf_variables(
-    secret: 'mysecret',
+    secret: 'abcdefghijk',
     langs: %w(en fr)
   )
   args([
@@ -115,14 +72,18 @@ play 'servicename' do
 end
 ```
 
-The application configuration defined in conf_path will be created/replaced by template defined in conf_template.
+The application configuration defined in conf_path will be created/replaced by template defined in conf_source.
 
-#### Install exploded standalone distribution as service and don't generate application.conf
+#### Install a standalone distribution from local file as service and generate application.conf from another cookbook
 
 ```ruby
-play 'sample_service' do
-  source '/var/local/mysample'
-  project_name 'sample'
+play 'file:///var/chef/cache/myapp-1.0.0.zip' do
+  conf_cookbook 'mycookbook'
+  conf_source 'application.conf.erb'
+  conf_variables(
+    secret: 'abcdefghijk',
+    langs: %w(en fr)
+  )
   args([
     '-Dhttp.port=8080',
     '-J-Xms128m',
@@ -133,7 +94,23 @@ play 'sample_service' do
 end
 ```
 
-Since no conf_variables are passed, the application configuration defined in conf_path will be used.
+The application configuration defined in conf_path will be created/replaced by template defined in conf_source.
+
+#### Install exploded standalone distribution as service and don't generate application.conf from template
+
+```ruby
+play '/opt/myapp' do
+   args([
+    '-Dhttp.port=8080',
+    '-J-Xms128m',
+    '-J-Xmx512m',
+    '-J-server'
+  ])
+  action :install
+end
+```
+
+Since both conf_local false and conf_cookbook nil, the application configuration defined in conf_path will be used.
 
 ## ChefSpec Matchers
 
@@ -143,21 +120,32 @@ own cookbooks.
 Example Matcher Usage
 
 ```ruby
-expect(chef_run).to install_play('servicename').with(
-  source: 'https://github.com/dhoer/play-java-sample/releases/download/1.0/play-java-sample-1.0.zip',
+expect(chef_run).to install_play(
+  'https://github.com/dhoer/play-java-sample/releases/download/1.0/play-java-sample-1.0.zip'
+).with(
+  conf_local true
+  conf_source 'conf/application.conf.erb'
+  conf_path 'conf/application.conf'
   conf_variables: {
     secret: 'abcdefghijk'
+    langs: %w(en fr)
   }
+  args: [
+    '-Dhttp.port=8080',
+    '-J-Xms128m',
+    '-J-Xmx512m',
+    '-J-server' 
+  ]
 )
 ```
-      
+ 
 Cookbook Matchers
 
-- install_play(servicename)
+- install_play(resource_name)
 
 ## Getting Help
 
-- Ask specific questions on [Stack Overflow](http://stackoverflow.com/questions/tagged/chef-play).
+- Ask specific questions on [Stack Overflow](http://stackoverflow.com/questions/tagged/playframework+chef).
 - Report bugs and discuss potential features in [Github issues](https://github.com/dhoer/chef-play/issues).
 
 ## Contributing

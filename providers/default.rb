@@ -1,129 +1,203 @@
-def whyrun_supported?
-  true
-end
-
 use_inline_resources
 
-def play_service(home_dir, conf_path)
-  # create pid directory
-  directory new_resource.pid_dir do
-    owner new_resource.user
-    group new_resource.user
-    mode 0755
-  end
-
-  project_name = play_project_name
-
-  ruby_block 'verify executable exists' do
-    block do
-      raise "Play executable #{home_dir}/bin/#{project_name} not found!"
-    end
-    not_if { ::File.exist?("#{home_dir}/bin/#{project_name}") }
-  end
-
-  # make play script executable
-  execute "chmod +x #{project_name}" do
-    cwd "#{home_dir}/bin"
-  end
-
-  service new_resource.servicename do
-    init_command "/etc/init.d/#{new_resource.servicename}"
-    supports status: true, start: true, stop: true, restart: true
-    action :nothing
-  end
-
-  # create play service
-  template "/etc/init.d/#{new_resource.servicename}" do
-    cookbook 'play'
-    source "#{node['platform_family']}.init.erb"
-    owner 'root'
-    group 'root'
-    mode 0755
-    variables(
-      servicename: new_resource.servicename,
-      source: home_dir,
-      executable: project_name,
-      user: new_resource.user,
-      pid_path: new_resource.pid_dir,
-      conf_path: conf_path,
-      args: new_resource.args.join(' ')
-    )
-    notifies :enable, "service[#{new_resource.servicename}]", :immediately
-    notifies :start, "service[#{new_resource.servicename}]", :immediately
-  end
+def systype
+  return 'systemd' if ::File.exist?('/proc/1/comm') && ::File.open('/proc/1/comm').gets.chomp == 'systemd'
+  return 'upstart' if platform?('ubuntu') && ::File.exist?('/sbin/initctl')
+  'systemv'
 end
 
-def play_configuration(home_dir, conf_path)
-  # make template path absolute, if relative
-  template_path =
-    new_resource.conf_template =~ %r{^/} ? new_resource.conf_template : "#{home_dir}/#{new_resource.conf_template}"
-
-  ruby_block 'verify conf_template can be run' do # ~FC021
-    block do
-      raise("Play conf_template #{template_path} not found!")
-    end
-    only_if { !new_resource.conf_variables.empty? && !::File.exist?(template_path) }
-  end
-
-  # generate application.conf
-  template conf_path do
-    local true
-    owner new_resource.user
-    source template_path
-    variables(new_resource.conf_variables)
-    sensitive true
-    only_if { !new_resource.conf_variables.empty? }
-    notifies :restart, "service[#{new_resource.servicename}]", :delayed
-  end
-end
-
-def play_project_name
+def project_name
   return new_resource.project_name if new_resource.project_name
   new_resource.source.match(%r{.*/(.*)-[0-9].*})[1] # http://rubular.com/r/X9PUgZl0UW
 rescue
   raise 'Play project_name not defined!'
 end
 
-def play_app_version
-  return new_resource.version if new_resource.version
-  new_resource.source.match(/-([\d|.(-SNAPSHOT)]*)[-|.]/)[1] # http://rubular.com/r/KN2ILF3mj3
-rescue
-  '1' # default version to 1
+def service_name
+  return new_resource.servicename if new_resource.servicename
+  project_name
 end
 
-def play_home_dir
-  ::File.directory?(new_resource.source) ? new_resource.source : "/usr/local/#{new_resource.servicename}"
+def install_dir
+  ::File.directory?(new_resource.source) ? new_resource.source : "#{new_resource.path}/#{project_name}-#{version}"
 end
 
-def play_conf_path(home_dir)
-  new_resource.conf_path =~ %r{^/} ? new_resource.conf_path : "#{home_dir}/#{new_resource.conf_path}"
+def home_dir
+  "#{new_resource.path}/#{service_name}"
+end
+
+def pid_dir
+  "/var/run/#{service_name}"
+end
+
+def play_exec
+  "#{home_dir}/bin/#{project_name}"
+end
+
+# make path absolute if relative
+def conf_path
+  ::File.exist?(new_resource.conf_path) ? new_resource.conf_path : "#{home_dir}/#{new_resource.conf_path}"
+end
+
+# if local, then make path absolute if relative, else return path
+def conf_source
+  if new_resource.conf_local
+    ::File.exist?(new_resource.conf_source) ? new_resource.conf_source : "#{home_dir}/#{new_resource.conf_source}"
+  else
+    new_resource.conf_source
+  end
+end
+
+def usr
+  new_resource.user.nil? ? service_name : new_resource.user
+end
+
+def grp
+  if new_resource.group.nil?
+    platform?('windows') ? 'Administrators' : service_name
+  else
+    new_resource.group
+  end
+end
+
+def filename(src = new_resource.source)
+  src.slice(src.rindex('/') + 1, src.size)
+end
+
+def version(src = new_resource.source)
+  src.match(/-([\d|.(-SNAPSHOT)]*)[-|.]/)[1] # http://rubular.com/r/KN2ILF3mj3
+end
+
+def zipped?
+  filename.include?('.zip')
 end
 
 action :install do
-  converge_by(new_resource) do
-    %w(unzip rsync).each do |pkg|
-      package "install play #{pkg} package dependency" do
-        package_name pkg
-      end
+  package 'unzip' if zipped?
+
+  user usr do # ~FC021
+    comment 'Play Framework User'
+    shell '/bin/false'
+    password new_resource.password
+    system true
+    only_if { new_resource.user.nil? }
+  end
+
+  group grp do # ~FC021
+    members usr
+    append true
+    only_if { new_resource.group.nil? }
+  end
+
+  directory new_resource.path do
+    recursive true
+    owner usr
+    group grp
+  end
+
+  source_filename = filename(new_resource.source)
+  cached_file = ::File.join(Chef::Config[:file_cache_path], source_filename)
+
+  remote_file cached_file do
+    source new_resource.source
+    checksum new_resource.checksum unless new_resource.checksum.nil?
+    not_if { ::File.directory?(new_resource.source) }
+    notifies(:run, "execute[untar #{cached_file}]", :immediately) unless zipped?
+    notifies(:run, "execute[unzip #{cached_file}]", :immediately) if zipped?
+  end
+
+  execute "untar #{cached_file}" do
+    command "tar -xzf #{cached_file} && chown -R #{usr}:#{grp} *"
+    cwd new_resource.path
+    action :nothing
+    notifies(:restart, "service[#{service_name}]")
+  end
+
+  execute "unzip #{cached_file}" do
+    command "unzip #{cached_file} && chown -R #{usr}:#{grp} *"
+    cwd new_resource.path
+    action :nothing
+    notifies(:restart, "service[#{service_name}]")
+  end
+
+  link home_dir do
+    to install_dir
+    owner usr
+    group grp
+    notifies(:restart, "service[#{service_name}]")
+  end
+
+  ruby_block 'verify executable exists' do
+    block do
+      raise "Play executable #{play_exec} not found!"
+    end
+    not_if { ::File.exist?(play_exec) }
+  end
+
+  execute 'make play script executable' do
+    command "chmod +x #{play_exec}"
+    only_if { zipped? }
+  end
+
+  # generate application.conf
+  template conf_path do
+    local new_resource.conf_local
+    cookbook new_resource.conf_cookbook if new_resource.conf_cookbook
+    owner usr
+    group grp
+    mode '0600'
+    source conf_source
+    variables(new_resource.conf_variables)
+    sensitive new_resource.sensitive
+    not_if { new_resource.conf_cookbook.nil? && !new_resource.conf_local }
+    notifies :restart, "service[#{service_name}]"
+  end
+
+  vars = {
+    name: service_name,
+    home: home_dir,
+    exec: play_exec,
+    args: new_resource.args.join(' '),
+    pid_dir: pid_dir,
+    user: usr,
+    group: grp,
+    config: conf_path
+  }
+
+  case systype
+  when 'systemd'
+    template "/etc/systemd/system/#{service_name}.service" do
+      source 'systemd.erb'
+      cookbook 'play'
+      variables vars
+      mode '0755'
+      notifies(:restart, "service[#{service_name}]")
+    end
+  when 'upstart'
+    template "/etc/init/#{service_name}.conf" do
+      source 'upstart.erb'
+      cookbook 'play'
+      variables vars
+      mode '0644'
+      notifies(:restart, "service[#{service_name}]")
+    end
+  else
+    directory pid_dir do
+      recursive true
+      owner usr
+      group grp
     end
 
-    user new_resource.user do
-      comment 'play'
-      system true
-      shell '/bin/false'
+    template "/etc/init.d/#{service_name}" do
+      cookbook 'play'
+      source 'systemv.erb'
+      mode '0755'
+      variables vars
+      notifies(:restart, "service[#{service_name}]")
     end
+  end unless platform?('windows')
 
-    ark new_resource.servicename do # ~FC021
-      url new_resource.source
-      checksum new_resource.checksum if new_resource.checksum
-      version play_app_version
-      owner new_resource.user
-      not_if { ::File.directory?(new_resource.source) }
-    end
-
-    home_dir = play_home_dir
-    conf_path = play_conf_path(home_dir)
-    play_service(home_dir, conf_path)
-    play_configuration(home_dir, conf_path)
+  service service_name do
+    action :enable
   end
 end
