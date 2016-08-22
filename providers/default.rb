@@ -48,12 +48,12 @@ def conf_source
 end
 
 def usr
-  new_resource.user.nil? ? 'play' : new_resource.user
+  new_resource.user.nil? ? service_name : new_resource.user
 end
 
 def grp
   if new_resource.group.nil?
-    platform?('windows') ? 'Administrators' : 'play'
+    platform?('windows') ? 'Administrators' : service_name
   else
     new_resource.group
   end
@@ -152,21 +152,23 @@ action :install do
     notifies :restart, "service[#{service_name}]"
   end
 
+  vars = {
+    name: service_name,
+    home: home_dir,
+    exec: play_exec,
+    args: new_resource.args.join(' '),
+    pid_dir: pid_dir,
+    user: usr,
+    group: grp,
+    config: conf_path
+  }
+
   case systype
   when 'systemd'
     template "/etc/systemd/system/#{service_name}.service" do
       source 'systemd.erb'
       cookbook 'play'
-      variables(
-        name: service_name,
-        home: home_dir,
-        exec: play_exec,
-        args: new_resource.args.join(' '),
-        pid_dir: pid_dir,
-        user: usr,
-        group: grp,
-        config: conf_path
-      )
+      variables vars
       mode '0755'
       notifies(:restart, "service[#{service_name}]")
     end
@@ -181,16 +183,7 @@ action :install do
       cookbook 'play'
       source 'systemv.erb'
       mode '0755'
-      variables(
-        name: service_name,
-        home: home_dir,
-        exec: play_exec,
-        args: new_resource.args.join(' '),
-        pid_dir: pid_dir,
-        user: usr,
-        group: grp,
-        config: conf_path
-      )
+      variables vars
       notifies(:restart, "service[#{service_name}]")
     end
   end unless platform?('windows')

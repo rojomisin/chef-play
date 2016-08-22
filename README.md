@@ -45,8 +45,8 @@ standalone distribution, absolute. Default `nil`.
 standalone distribution, absolute. Default `conf/application.conf`. 
 * `conf_variables` - Hash of application configuration variables required by application conf template. Default `{}`.
 * `args` - Array of additional configuration arguments.  Default `[]`. 
-* `user` - Creates a play user when nil or uses value passed in. Default `nil`.
-* `group` - Creates a play group when nil or uses value passed in. Default `nil`.
+* `user` - Creates a user using servicename when nil or uses value passed in. Default `nil`.
+* `group` - Creates a group using servicename when nil or uses value passed in. Default `nil`.
 * `path` - Path to install standalone distribution. Default `/opt/play`. 
 * `sensitive` - Suppress output. Default `true`.
 

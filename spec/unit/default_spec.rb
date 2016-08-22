@@ -21,11 +21,11 @@ describe 'play_test::default' do
   end
 
   it 'creates user' do
-    expect(chef_run).to create_user('play')
+    expect(chef_run).to create_user('play-java-sample')
   end
 
   it 'creates group' do
-    expect(chef_run).to create_group('play')
+    expect(chef_run).to create_group('play-java-sample')
   end
 
   it 'creates path' do
