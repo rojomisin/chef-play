@@ -3,6 +3,12 @@ require 'serverspec'
 # Required by serverspec
 set :backend, :exec
 
+def systype
+  return 'systemd' if ::File.exist?('/proc/1/comm') && ::File.open('/proc/1/comm').gets.chomp == 'systemd'
+  return 'upstart' if platform?('ubuntu') && ::File.exist?('/sbin/initctl')
+  'systemv'
+end
+
 describe 'dist zip' do
   # describe file('/opt/kitchen/cache/play-java-sample-1.0.zip') do
   #   it { should be_file }
@@ -48,24 +54,8 @@ describe 'dist zip' do
     it { should be_grouped_into 'play-java-sample' }
   end
 
-  if (os[:family] == 'redhat' && !os[:release].nil? && os[:release].split('.')[0].to_i < 7) ||
-     (os[:family] == 'ubuntu' && !os[:release].nil? && os[:release].split('.')[0].to_i < 15)
-    describe file('/etc/init.d/play-java-sample') do
-      it { should be_file }
-      it { should be_mode 755 }
-      it { should be_owned_by 'root' }
-      it { should be_grouped_into 'root' }
-      # its(:content) { should match(%r{PLAY_DIST_HOME="/local/sample_service"}) }
-      # its(:content) { should match(%r{PLAY="\$\{PLAY_DIST_HOME\}/bin/play-java-sample"}) }
-      # its(:content) { should match(/USER="play"/) }
-      # its(:content) { should match(%r{PID_PATH="/var/run/play"}) }
-      # its(:content) { should match(%r{PID_FILE="\$\{PID_PATH\}/sample_service.pid"}) }
-      # its(:content) { should match(%r{CONFIG_FILE="/local/sample_service/conf/application.conf"}) }
-      # its(:content) { should match(/APP_ARGS="-Dhttp\.port=8080 -J-Xms128M -J-Xmx512m -J-server"/) }
-      # its(:content) { should match(%r{su -s /bin/sh \$\{USER\} -c "\( \$\{PLAY\} -Dpidfile\.path=\$\{PID_FILE\}}) }
-      # its(:content) { should match(/-Dconfig\.file=\$\{CONFIG_FILE\} \$\{APP_ARGS\} &\ \)/) }
-    end
-  else # systemd
+  case systype
+  when 'systemd'
     describe file('/etc/systemd/system/play-java-sample.service') do
       it { should be_file }
       it { should be_mode 755 }
@@ -88,6 +78,40 @@ describe 'dist zip' do
 -J-Xms128M -J-Xmx512m -J-server})
       end
       its(:content) { should match(%r{ExecStopPost=/bin/rm -f /var/run/play-java-sample/play.pid}) }
+    end
+  when 'upstart'
+    describe file('/etc/init/play-java-sample') do
+      it { should be_file }
+      it { should be_mode 755 }
+      it { should be_owned_by 'root' }
+      it { should be_grouped_into 'root' }
+      its(:content) { should match(/description "Play play-java-sample service"/) }
+      its(:content) do
+        should match(%r{\[ -d /var/run/play-java-sample/play.pid \] || install -m 755 \
+-o /var/run/play-java-sample -g /var/run/play-java-sample -d /var/run/play-java-sample/play.pid})
+      end
+      its(:content) { should match(%r{chdir /opt/play/zip/play-java-sample}) }
+      its(:content) do
+        should match(%r{exec sudo -u /var/run/play-java-sample /var/run/play-java-sample \
+-Dpidfile.path=/var/run/play-java-sample/play.pid -Dconfig.file=/opt/play/zip/play-java-sample/conf/application.conf \
+-J-Xms128M -J-Xmx512m -J-server})
+      end
+    end
+  else
+    describe file('/etc/init.d/play-java-sample') do
+      it { should be_file }
+      it { should be_mode 755 }
+      it { should be_owned_by 'root' }
+      it { should be_grouped_into 'root' }
+      # its(:content) { should match(%r{PLAY_DIST_HOME="/local/sample_service"}) }
+      # its(:content) { should match(%r{PLAY="\$\{PLAY_DIST_HOME\}/bin/play-java-sample"}) }
+      # its(:content) { should match(/USER="play"/) }
+      # its(:content) { should match(%r{PID_PATH="/var/run/play"}) }
+      # its(:content) { should match(%r{PID_FILE="\$\{PID_PATH\}/sample_service.pid"}) }
+      # its(:content) { should match(%r{CONFIG_FILE="/local/sample_service/conf/application.conf"}) }
+      # its(:content) { should match(/APP_ARGS="-Dhttp\.port=8080 -J-Xms128M -J-Xmx512m -J-server"/) }
+      # its(:content) { should match(%r{su -s /bin/sh \$\{USER\} -c "\( \$\{PLAY\} -Dpidfile\.path=\$\{PID_FILE\}}) }
+      # its(:content) { should match(/-Dconfig\.file=\$\{CONFIG_FILE\} \$\{APP_ARGS\} &\ \)/) }
     end
   end
 

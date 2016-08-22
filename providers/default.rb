@@ -2,6 +2,7 @@ use_inline_resources
 
 def systype
   return 'systemd' if ::File.exist?('/proc/1/comm') && ::File.open('/proc/1/comm').gets.chomp == 'systemd'
+  return 'upstart' if platform?('ubuntu') && ::File.exist?('/sbin/initctl')
   'systemv'
 end
 
@@ -167,6 +168,14 @@ action :install do
   when 'systemd'
     template "/etc/systemd/system/#{service_name}.service" do
       source 'systemd.erb'
+      cookbook 'play'
+      variables vars
+      mode '0755'
+      notifies(:restart, "service[#{service_name}]")
+    end
+  when 'upstart'
+    template "/etc/init/#{service_name}" do
+      source 'upstart.erb'
       cookbook 'play'
       variables vars
       mode '0755'

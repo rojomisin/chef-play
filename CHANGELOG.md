@@ -4,9 +4,10 @@
 
 - Change resource_name default from servicename to source 
 - Default servicename to project_name when not defined 
+- Create user and group using servicename when not defined
 - Remove default recipe
 - Support systemd
-- Remove upstart script
+- Update upstart script
 - Update systemv script
 - Remove ark cookbook dependency
 
