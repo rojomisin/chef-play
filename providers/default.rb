@@ -178,7 +178,7 @@ action :install do
       source 'upstart.erb'
       cookbook 'play'
       variables vars
-      mode '0755'
+      mode '0644'
       notifies(:restart, "service[#{service_name}]")
     end
   else

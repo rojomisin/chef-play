@@ -5,7 +5,7 @@ set :backend, :exec
 
 def systype
   return 'systemd' if ::File.exist?('/proc/1/comm') && ::File.open('/proc/1/comm').gets.chomp == 'systemd'
-  return 'upstart' if platform?('ubuntu') && ::File.exist?('/sbin/initctl')
+  return 'upstart' if ::File.exist?('/sbin/initctl')
   'systemv'
 end
 
@@ -82,7 +82,7 @@ describe 'dist zip' do
   when 'upstart'
     describe file('/etc/init/play-java-sample.conf') do
       it { should be_file }
-      it { should be_mode 755 }
+      it { should be_mode 644 }
       it { should be_owned_by 'root' }
       it { should be_grouped_into 'root' }
       its(:content) { should match(/description "Play play-java-sample service"/) }
