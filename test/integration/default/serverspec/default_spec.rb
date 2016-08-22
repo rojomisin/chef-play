@@ -92,7 +92,7 @@ describe 'dist zip' do
       end
       its(:content) { should match(%r{chdir /opt/play/zip/play-java-sample}) }
       its(:content) do
-        should match(%r{exec sudo -u /var/run/play-java-sample /var/run/play-java-sample \
+        should match(%r{exec sudo -u play-java-sample /opt/play/zip/play-java-sample/bin/play-java-sample \
 -Dpidfile.path=/var/run/play-java-sample/play.pid -Dconfig.file=/opt/play/zip/play-java-sample/conf/application.conf \
 -J-Xms128M -J-Xmx512m -J-server})
       end
