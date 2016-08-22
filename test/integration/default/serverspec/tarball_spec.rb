@@ -5,7 +5,7 @@ set :backend, :exec
 
 def systype
   return 'systemd' if ::File.exist?('/proc/1/comm') && ::File.open('/proc/1/comm').gets.chomp == 'systemd'
-  return 'upstart' if ::File.exist?('/sbin/initctl')
+  return 'upstart' if os[:family] == 'ubuntu' && ::File.exist?('/sbin/initctl')
   'systemv'
 end
 
@@ -105,15 +105,15 @@ describe 'dist tgz' do
       it { should be_mode 755 }
       it { should be_owned_by 'root' }
       it { should be_grouped_into 'root' }
-      # its(:content) { should match(%r{PLAY_DIST_HOME="/local/sample_service"}) }
-      # its(:content) { should match(%r{PLAY="\$\{PLAY_DIST_HOME\}/bin/play-java-sample"}) }
-      # its(:content) { should match(/USER="play"/) }
-      # its(:content) { should match(%r{PID_PATH="/var/run/play"}) }
-      # its(:content) { should match(%r{PID_FILE="\$\{PID_PATH\}/sample_service.pid"}) }
-      # its(:content) { should match(%r{CONFIG_FILE="/local/sample_service/conf/application.conf"}) }
-      # its(:content) { should match(/APP_ARGS="-Dhttp\.port=8080 -J-Xms128M -J-Xmx512m -J-server"/) }
-      # its(:content) { should match(%r{su -s /bin/sh \$\{USER\} -c "\( \$\{PLAY\} -Dpidfile\.path=\$\{PID_FILE\}}) }
-      # its(:content) { should match(/-Dconfig\.file=\$\{CONFIG_FILE\} \$\{APP_ARGS\} &\ \)/) }
+      its(:content) { should match(%r{PLAY_DIST_HOME="/opt/play/tar/play-java-sample-tar"}) }
+      its(:content) { should match(%r{PLAY="/opt/play/tar/play-java-sample-tar/bin/play-java-sample"}) }
+      its(:content) { should match(/USER="play-java-sample-tar"/) }
+      its(:content) { should match(%r{PID_PATH="/var/run/play-java-sample-tar"}) }
+      its(:content) { should match(%r{PID_FILE="\$\{PID_PATH\}/play.pid"}) }
+      its(:content) { should match(%r{CONFIG_FILE="/opt/play/tar/play-java-sample-tar/conf/application.conf"}) }
+      its(:content) { should match(/APP_ARGS="-Dhttp\.port=8080 -J-Xms128M -J-Xmx512m -J-server"/) }
+      its(:content) { should match(%r{su -s /bin/sh \$\{USER\} -c "\( \$\{PLAY\} -Dpidfile\.path=\$\{PID_FILE\}}) }
+      its(:content) { should match(/-Dconfig\.file=\$\{CONFIG_FILE\} \$\{APP_ARGS\} &\ \)/) }
     end
   end
 
