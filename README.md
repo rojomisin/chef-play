@@ -22,8 +22,8 @@ Installs Play 2.2+
 
 # Usage
 
-Installs Play 2.2+ standalone distribution and configures it as a systemd or systemv service. The servicename will 
-default to the project_name of the distribution if none is provided. The application.conf file can be 
+Installs Play 2.2+ standalone distribution and configures it as a systemd, upstart, or systemv service. The servicename 
+will default to the project_name of the distribution if none is provided. The application.conf file can be 
 created/overwritten with a template 
 [included in the distribution](https://github.com/dhoer/chef-play/wiki/Creating-a-local-template) or by an external 
 template from another cookbook.  For Linux users, zip files do not retain Linux file permissions so when the file is 
