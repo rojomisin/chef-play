@@ -8,44 +8,44 @@ describe 'dist tgz' do
   #   it { should be_file }
   # end
 
-  describe user('play') do
+  describe user('play-java-sample-tar') do
     it { should exist }
-    it { should belong_to_group 'play' }
+    it { should belong_to_group 'play-java-sample-tar' }
   end
 
   describe file('/opt/play/tar/play-java-sample-1.0') do
     it { should be_directory }
     it { should be_mode 755 }
-    it { should be_owned_by 'play' }
-    it { should be_grouped_into 'play' }
+    it { should be_owned_by 'play-java-sample-tar' }
+    it { should be_grouped_into 'play-java-sample-tar' }
   end
 
   describe file('/opt/play/tar/play-java-sample-tar') do
     it { should be_linked_to '/opt/play/tar/play-java-sample-1.0' }
     it { should be_mode 777 }
-    it { should be_owned_by 'play' }
-    it { should be_grouped_into 'play' }
+    it { should be_owned_by 'play-java-sample-tar' }
+    it { should be_grouped_into 'play-java-sample-tar' }
   end
 
   describe file('/opt/play/tar/play-java-sample-tar/bin/play-java-sample') do
     it { should be_file }
     it { should be_mode 755 }
-    it { should be_owned_by 'play' }
-    it { should be_grouped_into 'play' }
+    it { should be_owned_by 'play-java-sample-tar' }
+    it { should be_grouped_into 'play-java-sample-tar' }
   end
 
   describe file('/opt/play/tar/play-java-sample-tar/conf/application.conf') do
     it { should be_file }
     it { should be_mode 600 }
-    it { should be_owned_by 'play' }
-    it { should be_grouped_into 'play' }
+    it { should be_owned_by 'play-java-sample-tar' }
+    it { should be_grouped_into 'play-java-sample-tar' }
     its(:content) { should match(/play.crypto.secret = "mysecret"/) }
   end
 
   describe file('/var/run/play-java-sample-tar/play.pid') do
     it { should be_file }
-    it { should be_owned_by 'play' }
-    it { should be_grouped_into 'play' }
+    it { should be_owned_by 'play-java-sample-tar' }
+    it { should be_grouped_into 'play-java-sample-tar' }
   end
 
   if (os[:family] == 'redhat' && os[:release].split('.')[0].to_i < 7) ||

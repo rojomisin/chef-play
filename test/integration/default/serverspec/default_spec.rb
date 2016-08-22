@@ -8,44 +8,44 @@ describe 'dist zip' do
   #   it { should be_file }
   # end
 
-  describe user('play') do
+  describe user('play-java-sample') do
     it { should exist }
-    it { should belong_to_group 'play' }
+    it { should belong_to_group 'play-java-sample' }
   end
 
   describe file('/opt/play/zip/play-java-sample-1.0') do
     it { should be_directory }
     it { should be_mode 755 }
-    it { should be_owned_by 'play' }
-    it { should be_grouped_into 'play' }
+    it { should be_owned_by 'play-java-sample' }
+    it { should be_grouped_into 'play-java-sample' }
   end
 
   describe file('/opt/play/zip/play-java-sample') do
     it { should be_linked_to '/opt/play/zip/play-java-sample-1.0' }
     it { should be_mode 777 }
-    it { should be_owned_by 'play' }
-    it { should be_grouped_into 'play' }
+    it { should be_owned_by 'play-java-sample' }
+    it { should be_grouped_into 'play-java-sample' }
   end
 
   describe file('/opt/play/zip/play-java-sample/bin/play-java-sample') do
     it { should be_file }
     it { should be_mode 755 }
-    it { should be_owned_by 'play' }
-    it { should be_grouped_into 'play' }
+    it { should be_owned_by 'play-java-sample' }
+    it { should be_grouped_into 'play-java-sample' }
   end
 
   describe file('/opt/play/zip/play-java-sample/conf/application.conf') do
     it { should be_file }
     it { should be_mode 600 }
-    it { should be_owned_by 'play' }
-    it { should be_grouped_into 'play' }
+    it { should be_owned_by 'play-java-sample' }
+    it { should be_grouped_into 'play-java-sample' }
     its(:content) { should match(/play.crypto.secret = "mysecret"/) }
   end
 
   describe file('/var/run/play-java-sample/play.pid') do
     it { should be_file }
-    it { should be_owned_by 'play' }
-    it { should be_grouped_into 'play' }
+    it { should be_owned_by 'play-java-sample' }
+    it { should be_grouped_into 'play-java-sample' }
   end
 
   if (os[:family] == 'redhat' && !os[:release].nil? && os[:release].split('.')[0].to_i < 7) ||
