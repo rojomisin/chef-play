@@ -65,7 +65,8 @@ def filename(src = new_resource.source)
 end
 
 def version(src = new_resource.source)
-  src.match(/-([\d|.(-SNAPSHOT)]*)[-|.]/)[1] # http://rubular.com/r/KN2ILF3mj3
+  #src.match(/-([\d|.(-SNAPSHOT)]*)[-|.]/)[1] # http://rubular.com/r/KN2ILF3mj3
+  src.match(/-([\w|.(-SNAPSHOT)]*)[-|.]/)[1] 
 end
 
 def zipped?
