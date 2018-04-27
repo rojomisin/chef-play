@@ -8,7 +8,9 @@ end
 
 def project_name
   return new_resource.project_name if new_resource.project_name
-  new_resource.source.match(%r{.*/(.*)-[0-9].*})[1] # http://rubular.com/r/X9PUgZl0UW
+#   new_resource.source.match(%r{.*/(.*)-[0-9].*})[1] # http://rubular.com/r/X9PUgZl0UW
+#   .*\/(.*)-\w{40}.
+  new_resource.source.match(%r{.*/(.*)-\w{40}.*})[1] # http://rubular.com/r/X9PUgZl0UW
 rescue
   raise 'Play project_name not defined!'
 end
